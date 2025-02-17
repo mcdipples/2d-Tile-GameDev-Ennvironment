@@ -1,0 +1,91 @@
+@startuml
+
+class TMGE implements IGameManager {
+    +registerGame(game: Game): void
+    +getAvailableGames(): List<Game>
+    +getPlayerProfiles(): List<PlayerProfile>
+
+}
+
+interface IProfileManager {
+    +newProfile(PlayerProfile newPlayerProfile): void
+    +editProfile(PlayerProfile playerProfile): void 
+    +deleteProfile(PlayerProfile playerProfile): void 
+    +getPlayerProfiles(): ArrayList<PlayerProfile>
+}
+
+class PlayerProfile {
+    -username: String
+    -stats: Map<String, GameStats>
+    +login(username: String): void
+    +updateStats(gameId: String, stats: GameStats): void
+}
+
+class GameStats {
+    -highScore: int
+    -gamesPlayed: int
+    -wins: int
+    +updateScore(score: int): void
+    +incrementGamesPlayed(): void
+    +addWin(): void
+}
+
+abstract class Game implements IGameLoop, IInputHandler {
+    #grid: Grid
+    #players: List<Player>
+    {abstract} initializeGame(): void
+    {abstract} checkWinCondition(): boolean
+}
+
+class Grid {
+    -rows: int
+    -columns: int
+    -tiles: Tile[][]
+    +placeTile(tile: Tile, x: int, y: int): void
+    +getTile(x: int, y: int): Tile
+    +clearMatches(): void
+}
+
+class Tile {
+    -type: TileType
+    -state: TileState
+    +isMatching(other: Tile): boolean
+}
+
+interface IGameLoop {
+    +init(): void
+    +update():void
+    +draw(): void
+}
+
+interface IGameManager {
+    +start(): void
+    +quit(): void
+}
+
+class Player implements IProfileManager {
+    ' single profile logged on per instance
+    ' for 2 players => player1 is whoever is logged into instance
+    ' load player 2's profile by having them log in w user and pass
+    '
+    ' DATA: JSON
+    -profile: PlayerProfile
+    -score: int
+    +updateScore(points: int): void
+}
+
+interface IInputHandler {
+    +handleKeyPress(event: KeyEvent): void
+    +handleKeyRelease(event: KeyEvent): void
+}
+
+TMGE "1" o-- "2...*" PlayerProfile
+TMGE "1" o-- "1..*" Game
+Game <|-- "Concrete Games"
+Game "1" *-- "1" Grid
+Game "1" *-- "2" Player
+Grid "1" *-- "*" Tile
+Player --> PlayerProfile : has
+PlayerProfile "1" -- "*" GameStats
+
+@enduml
