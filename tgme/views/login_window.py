@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
-from player_profile import PlayerProfile
-from tmge import TMGE
+from tgme.player_profile import PlayerProfile
+from tgme.tmge import TMGE
 
 class LoginWindow:
     def __init__(self, tmge: TMGE, on_login_success) -> None:

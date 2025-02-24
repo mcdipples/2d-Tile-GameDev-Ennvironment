@@ -1,14 +1,18 @@
 from typing import List, Optional
 import time
-from game import Game
-from player import Player
-from tile import Tile
-from tetris_piece import TetrisPiece
-from grid import Grid
+from tgme.game import Game
+from tgme.player import Player
+from tgme.tile import Tile
+from games.tetris_piece import TetrisPiece
+from tgme.grid import Grid
 
 class TetrisGame(Game):
     def __init__(self, game_id: str, players: List[Player]) -> None:
         # Create two separate grids for two players
+
+        #TODO: make this Grid class implementable from the Grid class in the tgme package.
+        #? Tetrisgrid should be a child of Grid.
+
         self.grids = [Grid(20, 10), Grid(20, 10)]  # One grid per player
         self.game_id = game_id
         self.players = players
@@ -61,6 +65,7 @@ class TetrisGame(Game):
             elif key == self.controls[1]['drop']:
                 self._hard_drop(1)
 
+    #TODO: implement piece movement logic with Grid.place_tile() and Grid.get_tile()
     def _move_piece(self, player: int, dx: int, dy: int) -> bool:
         if not self.current_pieces[player]:
             return False

@@ -1,4 +1,4 @@
-from player_profile import PlayerProfile
+from tgme.player_profile import PlayerProfile
 from typing import Optional
 
 class Player:

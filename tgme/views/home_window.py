@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from typing import Dict, Any
-from player_profile import PlayerProfile
-from tmge import TMGE
-from game_ui import GameUI
+from tgme.player_profile import PlayerProfile
+from tgme.tmge import TMGE
+from tgme.views.game_ui import GameUI
 
 class HomeWindow:
     def __init__(self, tmge: TMGE, profile: PlayerProfile) -> None:

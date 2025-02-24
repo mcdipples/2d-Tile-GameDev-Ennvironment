@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List
-from interfaces import IGameLoop, IInputHandler
-from grid import Grid
-from player import Player
+from tgme.interfaces import IGameLoop, IInputHandler
+from tgme.grid import Grid
+from tgme.tile import Tile
+from tgme.player import Player
 
 class Game(IGameLoop, IInputHandler, ABC):
     def __init__(self, game_id: str, rows: int, columns: int, players: List[Player]) -> None:

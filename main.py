@@ -1,12 +1,12 @@
 import tkinter as tk
-from tmge import TMGE
-from player_profile import PlayerProfile
-from player import Player
-from game import SampleMatchingGame
-from tetris_game import TetrisGame
-from game_ui import GameUI
-from login_window import LoginWindow
-from home_window import HomeWindow
+from tgme.tmge import TMGE
+from tgme.player_profile import PlayerProfile
+from tgme.player import Player
+from tgme.game import SampleMatchingGame
+from games.tetris_game import TetrisGame
+from tgme.views.game_ui import GameUI
+from tgme.views.login_window import LoginWindow
+from tgme.views.home_window import HomeWindow
 
 class TMGEApplication:
     def __init__(self) -> None:

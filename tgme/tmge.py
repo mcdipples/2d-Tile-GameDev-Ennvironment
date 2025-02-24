@@ -1,9 +1,9 @@
 import json
 import os
 from typing import List
-from interfaces import IGameManager
-from player_profile import PlayerProfile
-from game import Game
+from tgme.interfaces import IGameManager
+from tgme.player_profile import PlayerProfile
+from tgme.game import Game
 
 class TMGE(IGameManager):
     def __init__(self) -> None:
@@ -18,7 +18,7 @@ class TMGE(IGameManager):
         """
         self.games: List[Game] = []
         self.player_profiles: List[PlayerProfile] = []
-        self.profiles_file = "profiles.json"
+        self.profiles_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "profiles.json")
         self.load_profiles()
 
     def load_profiles(self) -> None:

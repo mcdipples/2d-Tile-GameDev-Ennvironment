@@ -29,7 +29,7 @@ class TetrisPiece:
         self.color = self.COLORS[self.shape]
         self.x = 4  # Starting x position (center of board)
         self.y = 0  # Starting y position (top of board)
-
+    
     def move(self, dx: int, dy: int) -> None:
         self.x += dx
         self.y += dy

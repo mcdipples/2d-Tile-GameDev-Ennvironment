@@ -1,10 +1,13 @@
 import tkinter as tk
 from typing import Optional, List
-from game import Game
-from grid import Grid
-from tile import Tile
+from tgme.game import Game
+from tgme.grid import Grid
+from tgme.tile import Tile
 
 class GameUI:
+    '''
+    This class is responsible for drawing the game UI.
+    '''
     def __init__(self, root: tk.Tk, game: Game) -> None:
         self.root = root
         self.game = game

@@ -1,5 +1,5 @@
 from typing import Dict
-from game_stats import GameStats
+from tgme.game_stats import GameStats
 
 class PlayerProfile:
     def __init__(self, username: str) -> None:
