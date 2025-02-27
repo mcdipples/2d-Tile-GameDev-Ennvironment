@@ -121,7 +121,12 @@ class TetrisGame(Game):
 
         for x, y in self.current_pieces[player].get_positions():
             if y >= 0:
-                tile = Tile(self.current_pieces[player].color, "locked")
+                # Create tile with the piece's color as both tile_type and tile_color
+                tile = Tile(
+                    self.current_pieces[player].color,
+                    "locked",
+                    color=self.current_pieces[player].color  # Add explicit color
+                )
                 self.grids[player].place_tile(tile, y, x)
 
     def _clear_lines(self, player: int) -> None:

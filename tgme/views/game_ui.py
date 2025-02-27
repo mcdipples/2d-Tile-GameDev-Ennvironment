@@ -63,8 +63,10 @@ class GameUI:
                         
                         tile = self.game.grids[player].get_tile(row, col)
                         if tile:
+                            # For Tetris tiles, use tile_type as color if tile_color is not present
+                            color = getattr(tile, 'tile_color', tile.tile_type)
                             self.canvas.create_rectangle(x1, y1, x2, y2, 
-                                                       fill=tile.tile_color, outline='gray')
+                                                       fill=color, outline='gray')
                         else:
                             self.canvas.create_rectangle(x1, y1, x2, y2, 
                                                        fill='lightgray', outline='gray')
@@ -72,25 +74,28 @@ class GameUI:
                 # Draw current piece based on game type
                 if self.game.current_pieces[player]:
                     piece = self.game.current_pieces[player]
-                    positions = piece.get_positions()
                     
-                    # Handle both Tetris and PuzzleFighter piece formats
-                    for pos in positions:
-                        if isinstance(pos, tuple):
-                            if len(pos) == 2:  # Tetris format (x, y)
-                                x, y = pos
-                                color = piece.color
-                            else:  # PuzzleFighter format (x, y, tile)
-                                x, y, tile = pos
-                                color = tile.tile_color
-                                
+                    # Handle PuzzleFighter format
+                    if hasattr(piece, 'get_positions') and len(piece.get_positions()[0]) == 3:
+                        for x, y, tile in piece.get_positions():
                             if y >= 0:  # Only draw if visible
                                 x1 = offset_x + x * self.cell_size
                                 y1 = y * self.cell_size
                                 x2 = x1 + self.cell_size
                                 y2 = y1 + self.cell_size
                                 self.canvas.create_rectangle(x1, y1, x2, y2,
-                                                           fill=color,
+                                                           fill=tile.tile_color,
+                                                           outline='white')
+                    # Handle Tetris format
+                    else:
+                        for x, y in piece.get_positions():
+                            if y >= 0:  # Only draw if visible
+                                x1 = offset_x + x * self.cell_size
+                                y1 = y * self.cell_size
+                                x2 = x1 + self.cell_size
+                                y2 = y1 + self.cell_size
+                                self.canvas.create_rectangle(x1, y1, x2, y2,
+                                                           fill=piece.color,
                                                            outline='white')
 
                 # Draw score
