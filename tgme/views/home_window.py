@@ -1,9 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from typing import Dict, Any
+from typing import Dict, Any, Type
 from tgme.player_profile import PlayerProfile
+from tgme.player import Player
 from tgme.tmge import TMGE
 from tgme.views.game_ui import GameUI
+from games.tetris_game import TetrisGame
+from games.puzzle_fighter_game import PuzzleFighterGame
 
 class HomeWindow:
     def __init__(self, tmge: TMGE, profile: PlayerProfile) -> None:
@@ -132,12 +135,23 @@ class HomeWindow:
                     style='Stats.TLabel'
                 ).pack(anchor='w')
 
-    def start_game(self, game: Any) -> None:
-        """Start the selected game"""
-        game.init()
+    def start_game(self, game_template: Any) -> None:
+        """Start a new instance of the selected game"""
+        # Create a second player for multiplayer games
+        player1 = Player(self.profile)
+        player2 = Player(PlayerProfile("Player2"))
+
+        # Create new instance of the game
+        game_class = type(game_template)
+        new_game = game_class(game_id=game_template.game_id, players=[player1, player2])
+
+        # Create new game window
         game_window = tk.Toplevel(self.window)
-        game_window.title(f"Playing {game.game_id}")
-        game_ui = GameUI(game_window, game)
+        game_window.title(f"Playing {new_game.game_id}")
+        
+        # Initialize game UI
+        game_ui = GameUI(game_window, new_game)
+        new_game.init()  # Initialize the new game instance
         game_ui.update()
 
     def refresh_stats(self) -> None:

@@ -1,4 +1,5 @@
 # TODO
+- [ ] Add scoring system to player profile
 - [x] Add logging for object instantiation (game pieces, players, etc.)
 - [x] Add logging for game state changes
 - [x] Add logging for important game events
@@ -14,7 +15,9 @@
         Provides both debug (file) and info (console) outputs
 
 ## Games
-- [ ] Implement a second game in engine
+- [x] Implement a second game in engine
+    Added:
+        Puzzle Fighter
 - [ ] Add controls attribute to Game base class for setting controls for each game
 - [ ] !! Change Tetris to use more of the TMGE engine.  (Grid functions -> TetrisGrid, Tile functions, etc.)
 
@@ -30,4 +33,5 @@
 # ISSUES
 
 - [x] !! Logout button exits entire program but should just return to main menu.
-- [ ] I think making new profiles overides old ones in profiles.json.
+- [x] I think making new profiles overides old ones in profiles.json.
+    + Not an issue for me when I ran it, need to replicate it on Sierra's computer

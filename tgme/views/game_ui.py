@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import Optional, List
+from typing import Optional, List, Tuple, Any
 from tgme.game import Game
 from tgme.grid import Grid
 from tgme.tile import Tile
@@ -48,9 +48,9 @@ class GameUI:
 
         self.canvas.delete('all')
 
-        if hasattr(self.game, 'grids'):  # Two-player Tetris
+        if hasattr(self.game, 'grids'):  # Multiplayer games
             # Draw both grids
-            for player in range(2):
+            for player in range(len(self.game.grids)):
                 offset_x = (self.game.grids[0].columns * self.cell_size + self.padding) * player
                 
                 # Draw grid background
@@ -64,22 +64,34 @@ class GameUI:
                         tile = self.game.grids[player].get_tile(row, col)
                         if tile:
                             self.canvas.create_rectangle(x1, y1, x2, y2, 
-                                                       fill=tile.tile_type, outline='gray')
+                                                       fill=tile.tile_color, outline='gray')
                         else:
                             self.canvas.create_rectangle(x1, y1, x2, y2, 
                                                        fill='lightgray', outline='gray')
 
-                # Draw current piece
+                # Draw current piece based on game type
                 if self.game.current_pieces[player]:
-                    for x, y in self.game.current_pieces[player].get_positions():
-                        if y >= 0:
-                            x1 = offset_x + x * self.cell_size
-                            y1 = y * self.cell_size
-                            x2 = x1 + self.cell_size
-                            y2 = y1 + self.cell_size
-                            self.canvas.create_rectangle(x1, y1, x2, y2,
-                                                       fill=self.game.current_pieces[player].color,
-                                                       outline='white')
+                    piece = self.game.current_pieces[player]
+                    positions = piece.get_positions()
+                    
+                    # Handle both Tetris and PuzzleFighter piece formats
+                    for pos in positions:
+                        if isinstance(pos, tuple):
+                            if len(pos) == 2:  # Tetris format (x, y)
+                                x, y = pos
+                                color = piece.color
+                            else:  # PuzzleFighter format (x, y, tile)
+                                x, y, tile = pos
+                                color = tile.tile_color
+                                
+                            if y >= 0:  # Only draw if visible
+                                x1 = offset_x + x * self.cell_size
+                                y1 = y * self.cell_size
+                                x2 = x1 + self.cell_size
+                                y2 = y1 + self.cell_size
+                                self.canvas.create_rectangle(x1, y1, x2, y2,
+                                                           fill=color,
+                                                           outline='white')
 
                 # Draw score
                 self.canvas.create_text(
@@ -98,6 +110,7 @@ class GameUI:
                         fill='red',
                         font=('Arial', 20, 'bold')
                     )
+
         else:
             if not self.canvas:
                 return
