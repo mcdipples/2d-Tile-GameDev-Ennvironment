@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from typing import Optional, List, Tuple, Any
 from tgme.game import Game
 from tgme.grid import Grid
@@ -11,33 +12,75 @@ class GameUI:
     def __init__(self, root: tk.Tk, game: Game) -> None:
         self.root = root
         self.game = game
-        self.canvas: Optional[tk.Canvas] = None
-        self.cell_size = 30  # Slightly smaller to fit both boards
-        self.padding = 50  # Space between boards
+        self.cell_size = 30
+        self.padding = 50
+        
+        # Modern color scheme
+        self.colors = {
+            'background': '#ffffff',
+            'grid_bg': '#f8f9fa',
+            'grid_line': '#dee2e6',
+            'text': '#212529'
+        }
+        
+        self.root.configure(bg=self.colors['background'])
         self.init_ui()
 
     def init_ui(self) -> None:
-        if hasattr(self.game, 'grids'):  # Two-player Tetris
+        # Calculate dimensions
+        if hasattr(self.game, 'grids'):
             width = (self.game.grids[0].columns * self.cell_size * 2) + self.padding
             height = self.game.grids[0].rows * self.cell_size
-        else:  # Single grid game
+        else:
             width = self.game.grid.columns * self.cell_size
             height = self.game.grid.rows * self.cell_size
 
+        # Main container
+        container = ttk.Frame(self.root)
+        container.pack(padx=40, pady=40)
+
+        # Game canvas
         self.canvas = tk.Canvas(
-            self.root,
+            container,
             width=width,
             height=height,
-            bg='white'
+            bg=self.colors['background'],
+            highlightthickness=0
         )
-        self.canvas.pack(padx=10, pady=10)
-        
-        # Create labels for controls
+        self.canvas.pack()
+
+        # Controls frame
+        controls_frame = ttk.Frame(container)
+        controls_frame.pack(fill=tk.X, pady=(20, 0))
+
         if hasattr(self.game, 'controls'):
-            controls1 = "Player 1: WASD + Space"
-            controls2 = "Player 2: Arrows + Enter"
-            tk.Label(self.root, text=controls1).pack()
-            tk.Label(self.root, text=controls2).pack()
+            # Player 1 controls
+            p1_frame = ttk.Frame(controls_frame)
+            p1_frame.pack(side=tk.LEFT)
+            ttk.Label(
+                p1_frame,
+                text="Player 1",
+                font=('Helvetica', 12, 'bold')
+            ).pack()
+            ttk.Label(
+                p1_frame,
+                text="WASD + Space",
+                font=('Helvetica', 10)
+            ).pack()
+
+            # Player 2 controls
+            p2_frame = ttk.Frame(controls_frame)
+            p2_frame.pack(side=tk.RIGHT)
+            ttk.Label(
+                p2_frame,
+                text="Player 2",
+                font=('Helvetica', 12, 'bold')
+            ).pack()
+            ttk.Label(
+                p2_frame,
+                text="Arrows + Enter",
+                font=('Helvetica', 10)
+            ).pack()
 
         self.root.bind('<Key>', self.game.handle_key_press)
         self.root.bind('<KeyRelease>', self.game.handle_key_release)
@@ -66,10 +109,10 @@ class GameUI:
                             # For Tetris tiles, use tile_type as color if tile_color is not present
                             color = getattr(tile, 'tile_color', tile.tile_type)
                             self.canvas.create_rectangle(x1, y1, x2, y2, 
-                                                       fill=color, outline='gray')
+                                                       fill=color, outline=self.colors['grid_line'])
                         else:
                             self.canvas.create_rectangle(x1, y1, x2, y2, 
-                                                       fill='lightgray', outline='gray')
+                                                       fill=self.colors['grid_bg'], outline=self.colors['grid_line'])
 
                 # Draw current piece based on game type
                 if self.game.current_pieces[player]:
@@ -103,7 +146,7 @@ class GameUI:
                     offset_x + 10, 10,
                     anchor='nw',
                     text=f'P{player+1} Score: {self.game.scores[player]}',
-                    fill='black'
+                    fill=self.colors['text']
                 )
 
                 # Draw game over
@@ -132,9 +175,9 @@ class GameUI:
                     
                     tile = self.game.grid.get_tile(row, col)
                     if tile:
-                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=tile.tile_type, outline='gray')
+                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=tile.tile_type, outline=self.colors['grid_line'])
                     else:
-                        self.canvas.create_rectangle(x1, y1, x2, y2, fill='lightgray', outline='gray')
+                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=self.colors['grid_bg'], outline=self.colors['grid_line'])
 
             # Draw current piece for Tetris
             if hasattr(self.game, 'current_piece') and self.game.current_piece:
@@ -156,7 +199,7 @@ class GameUI:
                     10, 10,
                     anchor='nw',
                     text=f'Score: {self.game.score}',
-                    fill='black'
+                    fill=self.colors['text']
                 )
 
     def _get_tile_color(self, tile: Tile) -> str:

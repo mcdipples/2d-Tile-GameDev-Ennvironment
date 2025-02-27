@@ -9,57 +9,138 @@ from games.tetris_game import TetrisGame
 from games.puzzle_fighter_game import PuzzleFighterGame
 
 class HomeWindow:
-    def __init__(self, tmge: TMGE, profile: PlayerProfile) -> None:
+    def __init__(self, tmge, profile) -> None:
         self.tmge = tmge
         self.profile = profile
         self.window = tk.Tk()
         self.window.title("TMGE Gaming Hub")
-        self.window.geometry("800x600")
-        self.window.minsize(800, 600)
-        self.create_widgets()
+        self.window.geometry("1024x768")
+        self.window.configure(bg='#ffffff')
+        
+        # Configure styles
         self.style = ttk.Style()
         self.setup_styles()
+        self.create_widgets()
 
     def setup_styles(self) -> None:
-        """Configure ttk styles for widgets"""
-        self.style.configure('Header.TLabel', font=('Helvetica', 24, 'bold'))
-        self.style.configure('Subheader.TLabel', font=('Helvetica', 16))
-        self.style.configure('GameButton.TButton', font=('Helvetica', 12), padding=10)
-        self.style.configure('Stats.TLabel', font=('Helvetica', 12))
+        """Configure modern ttk styles"""
+        self.style.configure('Modern.TFrame', background='#ffffff')
+        self.style.configure('Card.TFrame', background='#f8f9fa')
+        
+        self.style.configure('Title.TLabel',
+                            font=('Helvetica', 28, 'bold'),
+                            background='#ffffff')
+        
+        self.style.configure('Header.TLabel',
+                            font=('Helvetica', 20, 'bold'),
+                            background='#f8f9fa')
+        
+        self.style.configure('Stats.TLabel',
+                            font=('Helvetica', 12),
+                            background='#f8f9fa')
 
     def create_widgets(self) -> None:
-        """Create and arrange all GUI elements"""
         self.create_menu()
         
         # Main container
-        main_container = ttk.Frame(self.window, padding="10")
-        main_container.grid(row=0, column=0, sticky="nsew")
-        self.window.columnconfigure(0, weight=1)
-        self.window.rowconfigure(0, weight=1)
+        main_container = ttk.Frame(self.window, style='Modern.TFrame')
+        main_container.pack(fill=tk.BOTH, expand=True, padx=40, pady=40)
 
-        # Header
-        header_frame = ttk.Frame(main_container)
-        header_frame.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 20))
+        # Header with welcome message
         ttk.Label(
-            header_frame, 
-            text=f"Welcome, {self.profile.username}!", 
+            main_container,
+            text=f"Welcome back, {self.profile.username}",
+            style='Title.TLabel'
+        ).pack(anchor='w', pady=(0, 30))
+
+        # Content container
+        content = ttk.Frame(main_container, style='Modern.TFrame')
+        content.pack(fill=tk.BOTH, expand=True)
+        content.grid_columnconfigure(0, weight=3)
+        content.grid_columnconfigure(1, weight=2)
+
+        # Games section
+        self.create_games_section(content)
+        
+        # Stats section
+        self.create_stats_section(content)
+
+    def create_games_section(self, parent) -> None:
+        games_frame = ttk.Frame(parent, style='Modern.TFrame')
+        games_frame.grid(row=0, column=0, sticky='nsew', padx=(0, 20))
+
+        ttk.Label(
+            games_frame,
+            text="Available Games",
             style='Header.TLabel'
-        ).pack(pady=10)
+        ).pack(anchor='w', pady=(0, 20))
 
-        # Left panel - Game Selection
-        games_frame = ttk.LabelFrame(main_container, text="Available Games", padding="10")
-        games_frame.grid(row=1, column=0, sticky="nsew", padx=(0, 10))
-        self.create_games_panel(games_frame)
+        # Games grid
+        games_grid = ttk.Frame(games_frame, style='Modern.TFrame')
+        games_grid.pack(fill=tk.BOTH, expand=True)
 
-        # Right panel - Player Stats
-        stats_frame = ttk.LabelFrame(main_container, text="Player Statistics", padding="10")
-        stats_frame.grid(row=1, column=1, sticky="nsew")
-        self.create_stats_panel(stats_frame)
+        for i, game in enumerate(self.tmge.get_available_games()):
+            game_card = self.create_game_card(games_grid, game)
+            game_card.pack(fill=tk.X, pady=(0, 15))
 
-        # Configure grid weights
-        main_container.columnconfigure(0, weight=1)
-        main_container.columnconfigure(1, weight=1)
-        main_container.rowconfigure(1, weight=1)
+    def create_game_card(self, parent, game) -> ttk.Frame:
+        card = ttk.Frame(parent, style='Card.TFrame')
+        card.configure(padding=20)
+
+        # Game title
+        ttk.Label(
+            card,
+            text=game.game_id,
+            font=('Helvetica', 16, 'bold'),
+            background='#f8f9fa'
+        ).pack(side=tk.LEFT)
+
+        # Play button
+        play_btn = tk.Button(
+            card,
+            text="Play Now",
+            command=lambda: self.start_game(game),
+            bg='#007bff',
+            fg='white',
+            font=('Helvetica', 12),
+            relief='flat',
+            padx=20,
+            pady=8
+        )
+        play_btn.pack(side=tk.RIGHT)
+
+        return card
+
+    def create_stats_section(self, parent) -> None:
+        stats_frame = ttk.Frame(parent, style='Card.TFrame')
+        stats_frame.grid(row=0, column=1, sticky='nsew')
+        stats_frame.configure(padding=20)
+
+        ttk.Label(
+            stats_frame,
+            text="Your Statistics",
+            style='Header.TLabel'
+        ).pack(anchor='w', pady=(0, 20))
+
+        for game_id, stats in self.profile.stats.items():
+            game_stats = ttk.Frame(stats_frame, style='Card.TFrame')
+            game_stats.pack(fill=tk.X, pady=(0, 15))
+            game_stats.configure(padding=15)
+
+            ttk.Label(
+                game_stats,
+                text=game_id,
+                font=('Helvetica', 14, 'bold'),
+                background='#f8f9fa'
+            ).pack(anchor='w', pady=(0, 10))
+
+            for stat_name, value in stats.items():
+                stat_text = f"{stat_name.replace('_', ' ').title()}: {value}"
+                ttk.Label(
+                    game_stats,
+                    text=stat_text,
+                    style='Stats.TLabel'
+                ).pack(anchor='w', pady=2)
 
     def create_menu(self) -> None:
         """Create application menu bar"""
@@ -79,61 +160,6 @@ class HomeWindow:
         menubar.add_cascade(label="Help", menu=help_menu)
         help_menu.add_command(label="Game Controls", command=self.show_controls)
         help_menu.add_command(label="About", command=self.show_about)
-
-    def create_games_panel(self, parent: ttk.Frame) -> None:
-        """Create the games selection panel"""
-        ttk.Label(
-            parent,
-            text="Select a game to play:",
-            style='Subheader.TLabel'
-        ).pack(pady=(0, 10))
-
-        games_container = ttk.Frame(parent)
-        games_container.pack(fill=tk.BOTH, expand=True)
-
-        for game in self.tmge.get_available_games():
-            game_frame = ttk.Frame(games_container, padding="5")
-            game_frame.pack(fill=tk.X, pady=5)
-
-            ttk.Label(
-                game_frame,
-                text=game.game_id,
-                style='Stats.TLabel'
-            ).pack(side=tk.LEFT)
-
-            ttk.Button(
-                game_frame,
-                text="Play",
-                style='GameButton.TButton',
-                command=lambda g=game: self.start_game(g)
-            ).pack(side=tk.RIGHT)
-
-    def create_stats_panel(self, parent: ttk.Frame) -> None:
-        """Create the player statistics panel"""
-        ttk.Label(
-            parent,
-            text="Your Gaming Statistics",
-            style='Subheader.TLabel'
-        ).pack(pady=(0, 10))
-
-        stats_container = ttk.Frame(parent)
-        stats_container.pack(fill=tk.BOTH, expand=True)
-
-        # Display stats for each game
-        for game_id, stats in self.profile.stats.items():
-            game_stats_frame = ttk.LabelFrame(
-                stats_container,
-                text=game_id,
-                padding="5"
-            )
-            game_stats_frame.pack(fill=tk.X, pady=5)
-
-            for stat_name, value in stats.items():
-                ttk.Label(
-                    game_stats_frame,
-                    text=f"{stat_name.replace('_', ' ').title()}: {value}",
-                    style='Stats.TLabel'
-                ).pack(anchor='w')
 
     def start_game(self, game_template: Any) -> None:
         """Start a new instance of the selected game"""
