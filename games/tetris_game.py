@@ -8,14 +8,11 @@ from tgme.grid import Grid
 
 class TetrisGame(Game):
     def __init__(self, game_id: str, players: List[Player]) -> None:
+        # Call parent class constructor first
+        super().__init__(game_id, 20, 10, players)
+        
         # Create two separate grids for two players
-
-        #TODO: make this Grid class implementable from the Grid class in the tgme package.
-        #? Tetrisgrid should be a child of Grid.
-
         self.grids = [Grid(20, 10), Grid(20, 10)]  # One grid per player
-        self.game_id = game_id
-        self.players = players
         self.current_pieces = [None, None]  # One piece per player
         self.scores = [0, 0]  # Score for each player
         self.fall_times = [0, 0]
@@ -28,6 +25,8 @@ class TetrisGame(Game):
             {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'drop': 'space'},  # Player 1
             {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'drop': 'Return'}   # Player 2
         ]
+        
+        self.logger.debug("TetrisGame initialized with 2-player setup")
 
     def initialize_game(self) -> None:
         self.current_pieces = [TetrisPiece(), TetrisPiece()]

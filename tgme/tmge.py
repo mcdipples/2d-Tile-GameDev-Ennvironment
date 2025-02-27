@@ -4,6 +4,7 @@ from typing import List
 from tgme.interfaces import IGameManager
 from tgme.player_profile import PlayerProfile
 from tgme.game import Game
+from tgme.utils.logger import TMGELogger
 
 class TMGE(IGameManager):
     def __init__(self) -> None:
@@ -16,6 +17,9 @@ class TMGE(IGameManager):
         Returns:
             None
         """
+        self.logger = TMGELogger()
+        self.logger.info("Initializing TMGE")
+        
         self.games: List[Game] = []
         self.player_profiles: List[PlayerProfile] = []
         
@@ -28,7 +32,9 @@ class TMGE(IGameManager):
 
     def load_profiles(self) -> None:
         """Load player profiles from file"""
+        self.logger.debug("Loading player profiles")
         if not os.path.exists(self.profiles_file):
+            self.logger.info("Profiles file not found, creating new one")
             # Create empty profiles file if it doesn't exist
             try:
                 with open(self.profiles_file, 'w') as f:
@@ -54,6 +60,7 @@ class TMGE(IGameManager):
 
     def save_profiles(self) -> None:
         """Save player profiles to file"""
+        self.logger.debug("Saving player profiles")
         try:
             # Create backup of existing file
             if os.path.exists(self.profiles_file):
@@ -79,8 +86,10 @@ class TMGE(IGameManager):
 
             # Replace original file with temporary file
             os.replace(temp_file, self.profiles_file)
+            self.logger.info("Profiles saved successfully")
 
         except Exception as e:
+            self.logger.error(f"Failed to save profiles: {e}")
             print(f"Error saving profiles: {e}")
             # Try to restore from backup
             if os.path.exists(backup_file):
@@ -100,6 +109,7 @@ class TMGE(IGameManager):
         Returns:
             None
         """
+        self.logger.info(f"Registering game: {game.game_id}")
         self.games.append(game)
 
     def get_available_games(self) -> List[Game]:
@@ -136,6 +146,7 @@ class TMGE(IGameManager):
         Returns:
             None
         """
+        self.logger.info(f"Adding new player profile: {profile.username}")
         self.player_profiles.append(profile)
         self.save_profiles()
 

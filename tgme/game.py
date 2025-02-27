@@ -4,6 +4,7 @@ from tgme.interfaces import IGameLoop, IInputHandler
 from tgme.grid import Grid
 from tgme.tile import Tile
 from tgme.player import Player
+from tgme.utils.logger import TMGELogger
 
 class Game(IGameLoop, IInputHandler, ABC):
     def __init__(self, game_id: str, rows: int, columns: int, players: List[Player]) -> None:
@@ -19,9 +20,15 @@ class Game(IGameLoop, IInputHandler, ABC):
         Returns:
             None
         """
+        self.logger = TMGELogger()
+        self.logger.info(f"Initializing game: {game_id}")
+        
         self.game_id: str = game_id
         self.grid: Grid = Grid(rows, columns)
         self.players: List[Player] = players
+        
+        self.logger.debug(f"Created {rows}x{columns} grid for {game_id}")
+        self.logger.debug(f"Registered {len(players)} players")
 
     @abstractmethod
     def initialize_game(self) -> None:
@@ -59,6 +66,7 @@ class Game(IGameLoop, IInputHandler, ABC):
         Returns:
             None
         """
+        self.logger.info(f"Starting game: {self.game_id}")
         self.initialize_game()
 
     def update(self) -> None:
@@ -97,8 +105,9 @@ class Game(IGameLoop, IInputHandler, ABC):
         Returns:
             None
         """
-        # Handle key presses
-        pass
+        key = getattr(event, 'keysym', None)
+        if key:
+            self.logger.debug(f"Key pressed: {key}")
 
     def handle_key_release(self, event: object) -> None:
         """
@@ -110,8 +119,9 @@ class Game(IGameLoop, IInputHandler, ABC):
         Returns:
             None
         """
-        # Handle key releases
-        pass
+        key = getattr(event, 'keysym', None)
+        if key:
+            self.logger.debug(f"Key released: {key}")
 
 
 class SampleMatchingGame(Game):
