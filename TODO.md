@@ -22,5 +22,5 @@
 
 # ISSUES
 
-- [ ] !! Logout button exits entire program but should just return to main menu.
+- [x] !! Logout button exits entire program but should just return to main menu.
 - [ ] I think making new profiles overides old ones in profiles.json.

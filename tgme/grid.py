@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from tgme.tile import Tile
 
 class Grid:
@@ -20,23 +20,20 @@ class Grid:
         Returns:
             None
         """
+        if rows <= 0 or columns <= 0:
+            raise ValueError("Grid dimensions must be positive integers")
+            
         self.rows: int = rows
         self.columns: int = columns
         self.tiles: List[List[Optional[Tile]]] = [
             [None for _ in range(columns)] for _ in range(rows)
         ]
 
-    #& NEW, to replace valid move logic in each game.
-    def is_valid_move(self, x: int, y: int) -> bool:
-        '''
-        valid_move checks if the move is valid.
-        '''
+    def is_valid_position(self, x: int, y: int) -> bool:
+        """Check if a position is within grid bounds"""
         return 0 <= x < self.rows and 0 <= y < self.columns
-    
-    #? FLOW: handle_keypress -> check_valid_move -> 
-    #? place somewhere in grid -> use Tile.move() to actually change tile's position
 
-    def place_tile(self, tile: Tile, x: int, y: int) -> None:
+    def place_tile(self, tile: Tile, x: int, y: int) -> bool:
         """
         place_tile calls Tile.move()
 
@@ -46,10 +43,16 @@ class Grid:
             y (int): Column index
 
         Returns:
-            None
+            bool: True if the tile was placed, False otherwise
         """
-        if 0 <= x < self.rows and 0 <= y < self.columns:
-            self.tiles[x][y] = tile
+        if not isinstance(tile, Tile):
+            raise TypeError("Expected Tile object")
+            
+        if not self.is_valid_position(x, y):
+            return False
+            
+        self.tiles[x][y] = tile
+        return True
 
     def get_tile(self, x: int, y: int) -> Optional[Tile]:
         """
@@ -62,9 +65,9 @@ class Grid:
         Returns:
             tile (Optional[Tile]): Tile at that position, or None if out of bounds or empty
         """
-        if 0 <= x < self.rows and 0 <= y < self.columns:
-            return self.tiles[x][y]
-        return None
+        if not self.is_valid_position(x, y):
+            return None
+        return self.tiles[x][y]
 
     def check_matches(self) -> List[List[Tile]]:
         """
@@ -94,4 +97,4 @@ class Grid:
             None
         """
         # Placeholder for matching/clearing logic in a real game
-        pass  
+        pass
