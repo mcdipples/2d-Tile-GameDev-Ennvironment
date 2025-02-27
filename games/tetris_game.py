@@ -7,18 +7,21 @@ from games.tetris_piece import TetrisPiece
 from tgme.grid import Grid
 
 class TetrisGame(Game):
+    min_players = 1  # Class-level attribute
+    max_players = 2  # Class-level attribute
+    
     def __init__(self, game_id: str, players: List[Player]) -> None:
-        # Call parent class constructor first
+        # Call parent class constructor with inherited player limits
         super().__init__(game_id, 20, 10, players)
         
-        # Create two separate grids for two players
-        self.grids = [Grid(20, 10), Grid(20, 10)]  # One grid per player
-        self.current_pieces = [None, None]  # One piece per player
-        self.scores = [0, 0]  # Score for each player
-        self.fall_times = [0, 0]
+        # Create grids based on player count
+        self.grids = [Grid(20, 10) for _ in range(len(players))]
+        self.current_pieces = [None] * len(players)
+        self.scores = [0] * len(players)
+        self.fall_times = [0] * len(players)
         self.fall_speed = 0.5
-        self.last_falls = [time.time(), time.time()]
-        self.game_over = [False, False]
+        self.last_falls = [time.time()] * len(players)
+        self.game_over = [False] * len(players)
         
         # Player-specific controls
         self.controls = [
@@ -26,7 +29,7 @@ class TetrisGame(Game):
             {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'drop': 'Return'}   # Player 2
         ]
         
-        self.logger.debug("TetrisGame initialized with 2-player setup")
+        self.logger.debug(f"TetrisGame initialized with {len(players)}-player setup")
 
     def initialize_game(self) -> None:
         self.current_pieces = [TetrisPiece(), TetrisPiece()]
@@ -148,5 +151,21 @@ class TetrisGame(Game):
                 self._move_piece(player, 0, 1)
                 self.last_falls[player] = current_time
 
+    def check_loss_condition(self) -> bool:
+        """
+        Check if either player has lost by having pieces stack to the top.
+        In Tetris, both players can lose, or one player can lose while the other continues.
+        """
+        return any(self.game_over)  # Game can continue if only one player loses
+
     def check_win_condition(self) -> bool:
-        return all(self.game_over)
+        """
+        In Tetris, a win occurs when one player survives while the other loses,
+        or when a player reaches a target score.
+        """
+        if all(self.game_over):
+            # If both players are out, the one with the higher score wins
+            winner = 0 if self.scores[0] >= self.scores[1] else 1
+            self.logger.info(f"Player {winner + 1} wins with score {self.scores[winner]}")
+            return True
+        return False

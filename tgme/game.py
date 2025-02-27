@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict, Any, Optional
+from tkinter import messagebox
 from tgme.interfaces import IGameLoop, IInputHandler
 from tgme.grid import Grid
 from tgme.tile import Tile
@@ -23,9 +24,22 @@ class Game(IGameLoop, IInputHandler, ABC):
         self.logger = TMGELogger()
         self.logger.info(f"Initializing game: {game_id}")
         
+        # These should be set by child classes before calling super().__init__
+        if not hasattr(self, 'min_players'):
+            self.min_players = 1
+        if not hasattr(self, 'max_players'):
+            self.max_players = 1
+            
+        if not self.min_players <= len(players) <= self.max_players:
+            raise ValueError(f"Game requires {self.min_players}-{self.max_players} players")
+
         self.game_id: str = game_id
         self.grid: Grid = Grid(rows, columns)
         self.players: List[Player] = players
+        self.controls: Dict[int, Dict[str, str]] = {}
+        self.is_paused = False
+        self.is_game_over = False
+        self.current_player_count = len(players)
         
         self.logger.debug(f"Created {rows}x{columns} grid for {game_id}")
         self.logger.debug(f"Registered {len(players)} players")
@@ -56,6 +70,36 @@ class Game(IGameLoop, IInputHandler, ABC):
         """
         pass
 
+    @abstractmethod
+    def check_loss_condition(self) -> bool:
+        """Check if the game has been lost"""
+        pass
+
+    def handle_game_over(self) -> None:
+        """Handle game over state with restart/exit options"""
+        if messagebox.askyesno("Game Over", "Would you like to restart?"):
+            self.restart_game()
+        else:
+            self.exit_to_menu()
+
+    def restart_game(self) -> None:
+        """Reset game state and start new game"""
+        self.is_game_over = False
+        self.is_paused = False
+        self.initialize_game()
+        self.logger.info(f"Restarting game: {self.game_id}")
+
+    def exit_to_menu(self) -> None:
+        """Clean up and exit to main menu"""
+        self.is_game_over = True
+        self.logger.info(f"Exiting game: {self.game_id}")
+
+    def pause_game(self) -> None:
+        """Toggle game pause state"""
+        self.is_paused = not self.is_paused
+        state = "paused" if self.is_paused else "resumed"
+        self.logger.info(f"Game {state}: {self.game_id}")
+
     def init(self) -> None:
         """
         init
@@ -79,8 +123,16 @@ class Game(IGameLoop, IInputHandler, ABC):
         Returns:
             None
         """
-        # Placeholder for game loop logic
-        pass
+        if self.is_paused or self.is_game_over:
+            return
+
+        if self.check_loss_condition():
+            self.is_game_over = True
+            self.handle_game_over()
+        elif self.check_win_condition():
+            self.is_game_over = True
+            messagebox.showinfo("Congratulations", "You won!")
+            self.handle_game_over()
 
     def draw(self) -> None:
         """

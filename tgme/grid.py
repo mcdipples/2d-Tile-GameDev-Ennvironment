@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Set
 from tgme.tile import Tile
 
 class Grid:
@@ -69,32 +69,73 @@ class Grid:
             return None
         return self.tiles[x][y]
 
-    def check_matches(self) -> List[List[Tile]]:
-        """
-        check_matches
+    def check_tile_matches(self, min_match: int = 3) -> List[List[Tile]]:
+        """Check for matching tiles in rows, columns, and diagonals"""
+        matches: List[List[Tile]] = []
+        
+        # Check rows
+        for row in range(self.rows):
+            matches.extend(self._find_matches_in_line(
+                [self.get_tile(row, col) for col in range(self.columns)],
+                min_match
+            ))
+        
+        # Check columns
+        for col in range(self.columns):
+            matches.extend(self._find_matches_in_line(
+                [self.get_tile(row, col) for row in range(self.rows)],
+                min_match
+            ))
 
-        Args:
-            None
+        return matches
 
-        Returns:
-            matches (List[List[Tile]]): List of lists of matched tiles
-        """
-        # Placeholder for matching logic in a real game
-        return []
+    def _find_matches_in_line(self, line: List[Optional[Tile]], min_match: int) -> List[List[Tile]]:
+        """Find sequences of matching tiles in a line"""
+        matches = []
+        current_match = []
+        
+        for tile in line:
+            if not tile or not current_match:
+                current_match = [tile] if tile else []
+                continue
+                
+            if tile.is_matching(current_match[-1]):
+                current_match.append(tile)
+            else:
+                if len(current_match) >= min_match:
+                    matches.append(current_match)
+                current_match = [tile]
+        
+        if len(current_match) >= min_match:
+            matches.append(current_match)
+            
+        return matches
 
-    def clear_matches(self) -> None:
-        """
-        clear_matches removes all tiles that are matched based on the check_matches method.
+    def clear_matches(self, matches: List[List[Tile]]) -> int:
+        """Clear matched tiles and return points earned"""
+        cleared_count = 0
+        for match in matches:
+            for tile in match:
+                pos = tile.get_position()
+                self.tiles[pos[1]][pos[0]] = None
+                cleared_count += 1
+        return cleared_count
 
-        clearing logic is up to the developer to implement.
-
-        (example: tetris clears lines, )
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
-        # Placeholder for matching/clearing logic in a real game
-        pass
+    def is_valid_movement(self, tile: Tile, new_x: int, new_y: int) -> bool:
+        """Check if a tile can move to a new position"""
+        # Check bounds
+        if not (0 <= new_x < self.columns and 0 <= new_y < self.rows):
+            return False
+            
+        # Check collision with other tiles
+        for y in range(tile.tile_shape.height):
+            for x in range(tile.tile_shape.width):
+                if tile.tile_shape.pattern[y][x]:
+                    grid_x, grid_y = new_x + x, new_y + y
+                    if not self.is_valid_position(grid_x, grid_y):
+                        return False
+                    existing_tile = self.get_tile(grid_y, grid_x)
+                    if existing_tile and existing_tile != tile:
+                        return False
+        
+        return True

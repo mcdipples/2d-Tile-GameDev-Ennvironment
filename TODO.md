@@ -19,12 +19,13 @@
 - [ ] !! Change Tetris to use more of the TMGE engine.  (Grid functions -> TetrisGrid, Tile functions, etc.)
 
 ## Engine
-- [ ] Player count + 2p options in `Game ABC`
-- [ ] Game start/restart/exit options in `Game ABC`
-  use case example: user gets game over in tetris, user can either restart the game or exit to main menu. This popup is up to the developer to implement.
-- [ ] in `GameABC`, check win condition and check loss condition.
-- [ ] in `Grid`, check tile matches, clearing, and valid movement
-- [ ] in `Tile`, add `tile_shape`, `tile_color`, `tile_state`, `position` (x,y : top left corner of tile)
+- [x] Player count + 2p options in `Game ABC`
+- [x] Game start/restart/exit options in `Game ABC` use case example: user gets game over in tetris, user can either restart the game or exit to main menu. This popup is up to the developer to implement.
+- [x] in `GameABC`, check win condition and check loss condition.
+- [x] in `Grid`, check tile matches, clearing, and valid movement
+- [x] in `Tile`, add `tile_shape`, `tile_color`, `tile_state`, `position` (x,y : top left corner of tile)
+    Added: 
+        All of the above
 
 # ISSUES
 
