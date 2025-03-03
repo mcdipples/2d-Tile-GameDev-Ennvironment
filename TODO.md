@@ -30,6 +30,9 @@
     Added: 
         All of the above
 
+## Design
+- [x] Port & Update UML
+
 # ISSUES
 
 - [x] !! Logout button exits entire program but should just return to main menu.
