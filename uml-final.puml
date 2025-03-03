@@ -15,11 +15,33 @@ class TMGE implements IGameManager {
     +quit(): void
 }
 
+class TMGELogger {
+    #_instance: Object
+    #_initialized: bool
+    +setup_logger(): void
+    +debug(message: str): void
+    +info(message: str): void
+    +warning(message: str): void
+    +error(message: str): void
+    +critical(message: str): void
+}
+
+class TMGEApplication {
+    #tmge: TMGE
+    #current_profiles: List<PlayerProfile>
+    +on_login_success(profile: PlayerProfile): void
+    +show_main_window(): void
+    +quit_tmge(): void
+}
+
 ' --- Games ---
 abstract class Game implements IGameLoop, IInputHandler {
     #logger: TMGELogger
     #game_id: str
     #grid: Grid
+    #min_players: number
+    #max_players: number
+    #current_player_count: number
     #players: List<Player>
     #controls: Dict
     #is_paused: bool
@@ -34,6 +56,8 @@ abstract class Game implements IGameLoop, IInputHandler {
     +init(): void
     +update(): void
     +draw(): void
+    +handle_key_press(event: Object): void
+    +handle_key_release(event: Object): void
 }
 
 class TetrisGame extends Game {
@@ -100,7 +124,9 @@ class Grid {
     +place_tile(tile: Tile, x: int, y: int): bool
     +get_tile(x: int, y: int): Optional<Tile>
     +check_tile_matches(min_match: int): List<List<Tile>>
+    +_find_matches_in_line(line: List[Optional[Tile]], min_match: int): List[List[Tile]]
     +clear_matches(matches: List<List<Tile>>): int
+    +is_valid_movement(tile: Tile, new_x: int, new_y: int): bool
 }
 
 class Tile {
@@ -117,7 +143,7 @@ class Tile {
 
 ' --- UI Components ---
 class GameUI {
-    -root: tk.Tk
+    -root: Tkinter
     -game: Game
     -cell_size: int
     -padding: int
@@ -126,23 +152,34 @@ class GameUI {
     +init_ui(): void
     +draw_grid(): void
     +update(): void
+    +_get_tile_color(tile: Tile): str
 }
 
 class HomeWindow {
     -tmge: TMGE
     -profile: PlayerProfile
-    -window: tk.Tk
+    -window: Tkinter
+    -stle: TKinter.Style
+    +setup_styles(): void
     +create_widgets(): void
     +create_games_section(): void
-    +create_stats_section(): void
+    +create_game_card(parent: Object, game: Game): Tkinter.Frame
+    +create_stats_section(parent: Object): void
     +create_menu(): void
     +start_game(): void
+    +refresh_stats(): void
+    +show_controls(): void
+    +show_about(): void
+    +logout(): void
+    +quit_application(): void
 }
 
 class LoginWindow {
     -tmge: TMGE
     -window: tk.Tk
     -username_entry: ttk.Entry
+    -on_login_success: Object
+    -style: Tkinter.Style
     +setup_ui(): void
     +login(): void
     +show_create_profile(): void
@@ -171,6 +208,22 @@ class GameStats {
     +increment_games_played(): void
     +add_win(): void
 }
+' --- Interfaces ---
+interface IGameManager {
+    {abstract} quit(): void
+}
+
+interface IGameLoop {
+    {abstract} update()
+    {abstract} draw()
+}
+
+interface IInputHandler() {
+    {abstract} handle_key_press(event: Object)
+    {abstract} handle_key_release(event: Object)
+}
+
+
 
 ' --- Relationships ---
 TMGE "1" o-- "*" Game
