@@ -1,0 +1,189 @@
+@startuml
+' --- Core Game Management ---
+class TMGE implements IGameManager {
+    -logger: TMGELogger
+    -games: List<Game>
+    -player_profiles: List<PlayerProfile>
+    -profiles_file: str
+    +load_profiles(): void
+    +save_profiles(): void
+    +register_game(game: Game): void
+    +get_available_games(): List<Game>
+    +get_player_profiles(): List<PlayerProfile>
+    +add_player_profile(profile: PlayerProfile): void
+    +start(): void
+    +quit(): void
+}
+
+' --- Games ---
+abstract class Game implements IGameLoop, IInputHandler {
+    #logger: TMGELogger
+    #game_id: str
+    #grid: Grid
+    #players: List<Player>
+    #controls: Dict
+    #is_paused: bool
+    #is_game_over: bool
+    {abstract} initialize_game(): void
+    {abstract} check_win_condition(): bool
+    {abstract} check_loss_condition(): bool
+    +handle_game_over(): void
+    +restart_game(): void
+    +exit_to_menu(): void
+    +pause_game(): void
+    +init(): void
+    +update(): void
+    +draw(): void
+}
+
+class TetrisGame extends Game {
+    -grids: List<Grid>
+    -current_pieces: List<TetrisPiece>
+    -scores: List<int>
+    -fall_times: List<float>
+    -fall_speed: float
+    -last_falls: List<float>
+    -game_over: List<bool>
+    +_move_piece(player: int, dx: int, dy: int): bool
+    +_rotate_piece(player: int): void
+    +_hard_drop(player: int): void
+    +_freeze_piece(player: int): void
+    +_clear_lines(player: int): void
+}
+
+class PuzzleFighterGame extends Game {
+    -grids: List<Grid>
+    -current_pieces: List<PuzzleFighterPiece>
+    -scores: List<int>
+    -fall_times: List<float>
+    -combo_counters: List<int>
+    -pending_attacks: List<List>
+    +_check_chain_reaction(): void
+    +_process_power_gems(): void
+    +_apply_gravity(): void
+}
+
+' --- Game Pieces ---
+class TetrisPiece {
+    +SHAPES: Dict
+    +COLORS: Dict
+    -shape: str
+    -coords: List<Tuple>
+    -color: str
+    -x: int
+    -y: int
+    +move(dx: int, dy: int): void
+    +rotate(): void
+    +get_positions(): List<Tuple>
+}
+
+class PuzzleFighterPiece {
+    +COLORS: List<str>
+    +TYPES: List<str>
+    -main_color: str
+    -sub_color: str
+    -is_power: bool
+    -x: int
+    -y: int
+    -connector_position: str
+    +rotate_clockwise(): void
+    +get_positions(): List<Tuple>
+    +move(dx: int, dy: int): void
+}
+
+' --- Grid System ---
+class Grid {
+    -rows: int
+    -columns: int
+    -tiles: List<List<Tile>>
+    +is_valid_position(x: int, y: int): bool
+    +place_tile(tile: Tile, x: int, y: int): bool
+    +get_tile(x: int, y: int): Optional<Tile>
+    +check_tile_matches(min_match: int): List<List<Tile>>
+    +clear_matches(matches: List<List<Tile>>): int
+}
+
+class Tile {
+    -tile_type: Any
+    -tile_state: str
+    -tile_shape: TileShape
+    -tile_color: str
+    -position: Tuple<int, int>
+    +set_position(x: int, y: int): void
+    +get_position(): Tuple<int, int>
+    +is_matching(other: Tile): bool
+    +occupies_position(x: int, y: int): bool
+}
+
+' --- UI Components ---
+class GameUI {
+    -root: tk.Tk
+    -game: Game
+    -cell_size: int
+    -padding: int
+    -colors: Dict
+    -canvas: tk.Canvas
+    +init_ui(): void
+    +draw_grid(): void
+    +update(): void
+}
+
+class HomeWindow {
+    -tmge: TMGE
+    -profile: PlayerProfile
+    -window: tk.Tk
+    +create_widgets(): void
+    +create_games_section(): void
+    +create_stats_section(): void
+    +create_menu(): void
+    +start_game(): void
+}
+
+class LoginWindow {
+    -tmge: TMGE
+    -window: tk.Tk
+    -username_entry: ttk.Entry
+    +setup_ui(): void
+    +login(): void
+    +show_create_profile(): void
+    +create_profile(): void
+}
+
+' --- Player Management ---
+class Player {
+    -profile: PlayerProfile
+    -score: int
+    +update_score(points: int): void
+}
+
+class PlayerProfile {
+    -username: str
+    -stats: Dict<str, GameStats>
+    +login(username: str): void
+    +update_stats(game_id: str, stats: GameStats): void
+}
+
+class GameStats {
+    -high_score: int
+    -games_played: int
+    -wins: int
+    +update_score(score: int): void
+    +increment_games_played(): void
+    +add_win(): void
+}
+
+' --- Relationships ---
+TMGE "1" o-- "*" Game
+TMGE "1" o-- "*" PlayerProfile
+Game "1" *-- "1..*" Grid
+Game "1" o-- "2" Player
+Game "1" -- "1" GameUI
+TetrisGame "1" *-- "*" TetrisPiece
+PuzzleFighterGame "1" *-- "*" PuzzleFighterPiece
+Grid "1" *-- "*" Tile
+Player "1" -- "1" PlayerProfile
+PlayerProfile "1" -- "*" GameStats
+HomeWindow "1" -- "1" TMGE
+LoginWindow "1" -- "1" TMGE
+GameUI "1" -- "1" Game
+@enduml
