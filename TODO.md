@@ -18,7 +18,7 @@
 - [x] Implement a second game in engine
     Added:
         Puzzle Fighter
-- [ ] Add controls attribute to Game base class for setting controls for each game
+- [x] Add controls attribute to Game base class for setting controls for each game
 - [ ] !! Change Tetris to use more of the TMGE engine.  (Grid functions -> TetrisGrid, Tile functions, etc.)
 
 ## Engine
