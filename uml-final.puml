@@ -220,7 +220,7 @@ interface IGameLoop {
     {abstract} draw()
 }
 
-interface IInputHandler() {
+interface IInputHandler {
     {abstract} handle_key_press(event: Object)
     {abstract} handle_key_release(event: Object)
 }
@@ -228,11 +228,12 @@ interface IInputHandler() {
 
 
 ' --- Relationships ---
+TMGEApplication "1" o-- "1" TMGE
 TMGE "1" o-- "*" Game
 TMGE "1" o-- "*" PlayerProfile
+TMGE "1" o-- "1" TMGELogger
 Game "1" *-- "1..*" Grid
 Game "1" o-- "2" Player
-Game "1" -- "1" GameUI
 TetrisGame "1" *-- "*" TetrisPiece
 PuzzleFighterGame "1" *-- "*" PuzzleFighterPiece
 Grid "1" *-- "*" Tile
