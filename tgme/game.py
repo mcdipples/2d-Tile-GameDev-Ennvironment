@@ -8,7 +8,7 @@ from tgme.player import Player
 from tgme.utils.logger import TMGELogger
 
 class Game(IGameLoop, IInputHandler, ABC):
-    def __init__(self, game_id: str, rows: int, columns: int, players: List[Player]) -> None:
+    def __init__(self, game_id: str, rows: int, columns: int, players: List[Player], controls: Dict) -> None:
         """
         __init__
 
@@ -36,7 +36,7 @@ class Game(IGameLoop, IInputHandler, ABC):
         self.game_id: str = game_id
         self.grid: Grid = Grid(rows, columns)
         self.players: List[Player] = players
-        self.controls: Dict[int, Dict[str, str]] = {}
+        self.controls: Dict[int, Dict[str, str]] = controls
         self.is_paused = False
         self.is_game_over = False
         self.current_player_count = len(players)

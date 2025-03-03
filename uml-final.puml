@@ -28,10 +28,12 @@ class TMGELogger {
 
 class TMGEApplication {
     #tmge: TMGE
+    #game_controls_dict: Dict
     #current_profiles: List<PlayerProfile>
     +on_login_success(profile: PlayerProfile): void
     +show_main_window(): void
     +quit_tmge(): void
+    +set_controls(): void
 }
 
 ' --- Games ---

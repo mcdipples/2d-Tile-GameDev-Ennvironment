@@ -11,8 +11,8 @@ class PuzzleFighterGame(Game):
     min_players = 1
     max_players = 2
     
-    def __init__(self, game_id: str, players: List[Player]) -> None:
-        super().__init__(game_id, 12, 6, players)
+    def __init__(self, game_id: str, players: List[Player], controls) -> None:
+        super().__init__(game_id, 12, 6, players, controls=controls)
         
         # Create grids for each player
         self.grids = [Grid(12, 6) for _ in range(len(players))]
@@ -24,11 +24,12 @@ class PuzzleFighterGame(Game):
         self.game_over = [False] * len(players)
         self.combo_counters = [0] * len(players)
         
-        # Controls for each player
-        self.controls = [
-            {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'counter_rotate': 'q'},
-            {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'counter_rotate': 'Delete'}
-        ]
+        # Controls are set in Game constructor
+        # # Controls for each player
+        # self.controls = [
+        #     {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'counter_rotate': 'q'},
+        #     {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'counter_rotate': 'Delete'}
+        # ]
         
         # Add attack queue
         self.pending_attacks = [[], []]  # List of rows to add for each player

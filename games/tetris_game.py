@@ -10,9 +10,9 @@ class TetrisGame(Game):
     min_players = 1  # Class-level attribute
     max_players = 2  # Class-level attribute
     
-    def __init__(self, game_id: str, players: List[Player]) -> None:
+    def __init__(self, game_id: str, players: List[Player], controls) -> None:
         # Call parent class constructor with inherited player limits
-        super().__init__(game_id, 20, 10, players)
+        super().__init__(game_id, 20, 10, players, controls=controls)
         
         # Create grids based on player count
         self.grids = [Grid(20, 10) for _ in range(len(players))]
@@ -23,11 +23,12 @@ class TetrisGame(Game):
         self.last_falls = [time.time()] * len(players)
         self.game_over = [False] * len(players)
         
-        # Player-specific controls
-        self.controls = [
-            {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'drop': 'space'},  # Player 1
-            {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'drop': 'Return'}   # Player 2
-        ]
+        # Controls are now set in Game constructor
+        # # Player-specific controls
+        # self.controls = [
+        #     {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'drop': 'space'},  # Player 1
+        #     {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'drop': 'Return'}   # Player 2
+        # ]
         
         self.logger.debug(f"TetrisGame initialized with {len(players)}-player setup")
 
