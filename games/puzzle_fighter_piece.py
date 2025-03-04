@@ -38,6 +38,7 @@ class PuzzleFighterPiece:
         else:  # up
             self.connector_position = 'right'
 
+    @property
     def get_positions(self) -> List[Tuple[int, int, Tile]]:
         """Get positions of both gems as (x, y, tile) tuples"""
         positions = [(self.x, self.y, self.main_tile)]

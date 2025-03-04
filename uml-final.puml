@@ -33,7 +33,7 @@ class TMGEApplication {
     +on_login_success(profile: PlayerProfile): void
     +show_main_window(): void
     +quit_tmge(): void
-    +set_controls(): void
+    +set_controls(): dict
 }
 
 ' --- Games ---
@@ -162,6 +162,7 @@ class HomeWindow {
     -profile: PlayerProfile
     -window: Tkinter
     -stle: TKinter.Style
+    -controls: dict
     +setup_styles(): void
     +create_widgets(): void
     +create_games_section(): void

@@ -3,6 +3,10 @@ from abc import ABC
 from typing import Protocol
 
 class IGameManager(ABC):
+    def manage_games(self) -> None:
+        self.start()
+        self.quit()
+    
     @abc.abstractmethod
     def start(self) -> None:
         """

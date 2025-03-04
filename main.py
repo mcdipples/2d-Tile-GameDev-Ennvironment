@@ -14,12 +14,26 @@ class TMGEApplication:
         self.tmge = TMGE()
         self.tmge.start()
         self.current_profile = None
-        self.game_controls_dict = {}
+        self.game_controls_dict = self.set_controls()
 
     def on_login_success(self, profile: PlayerProfile) -> None:
         self.current_profile = profile
         self.show_main_window()
 
+    '''
+        def show_main_window(self) -> None:
+            # Create players for two-player games
+            player1 = Player(self.current_profile)
+            player2 = Player(PlayerProfile("Player2"))  # Temporary second player
+            
+            # Register games with two players
+            tetris_game = TetrisGame(game_id='Tetris', players=[player1, player2])
+            puzzle_fighter = PuzzleFighterGame(game_id='Puzzle Fighter', players=[player1, player2])
+            
+            self.tmge.register_game(tetris_game)
+            self.tmge.register_game(puzzle_fighter)
+    '''
+    
     def show_main_window(self) -> None:
         # Create players for two-player games
         player1 = Player(self.current_profile)
@@ -27,13 +41,13 @@ class TMGEApplication:
         
         # Register games with two players
         tetris_game = TetrisGame(game_id='Tetris', players=[player1, player2], controls=self.game_controls_dict['Tetris'])
-        puzzle_fighter = PuzzleFighterGame(game_id='Puzzle Fighter', players=[player1, player2], controls=self.game_controls_dict['PuzzleFighter'])
+        puzzle_fighter = PuzzleFighterGame(game_id='Puzzle Fighter', players=[player1, player2], controls=self.game_controls_dict['Puzzle Fighter'])
         
         self.tmge.register_game(tetris_game)
         self.tmge.register_game(puzzle_fighter)
 
         # Show home window
-        home = HomeWindow(self.tmge, self.current_profile)
+        home = HomeWindow(self.tmge, self.current_profile, self.game_controls_dict)
         home.window.mainloop()
 
     def quit_tmge(self) -> None:
@@ -41,18 +55,19 @@ class TMGEApplication:
         if self.root:
             self.root.quit()
     
-    def set_controls(self) -> None:
-        # Tetris Game Controls
-        self.game_controls_dict['Tetris'] = [
-            {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'drop': 'space'},  # Player 1
-            {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'drop': 'Return'}   # Player 2
-        ]
-
-        # Puzzle Fighter Game Controls
-        self.game_controls_dict['PuzzleFighter'] = [
-            {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'counter_rotate': 'q'},
-            {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'counter_rotate': 'Delete'}
-        ]
+    def set_controls(self) -> dict:
+        set_game_controls_dict = {
+            'Tetris': [
+                {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'drop': 'space'},  # Player 1
+                {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'drop': 'Return'}   # Player 2
+            ],
+            'Puzzle Fighter': [
+                {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'counter_rotate': 'q'},
+                {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'counter_rotate': 'Delete'}
+            ]
+        }
+        
+        return set_game_controls_dict
 
 def main() -> None:
     app = TMGEApplication()
