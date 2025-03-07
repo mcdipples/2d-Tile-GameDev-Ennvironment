@@ -1,5 +1,5 @@
 # TODO
-- [ ] Add scoring system to player profile
+- [ ] Jasper's dad has got it goin on with his mom
 - [x] Add logging for object instantiation (game pieces, players, etc.)
 - [x] Add logging for game state changes
 - [x] Add logging for important game events
@@ -19,7 +19,7 @@
     Added:
         Puzzle Fighter
 - [x] Add controls attribute to Game base class for setting controls for each game
-- [ ] !! Change Tetris to use more of the TMGE engine.  (Grid functions -> TetrisGrid, Tile functions, etc.)
+- [x] !! Change Tetris to use more of the TMGE engine.  (Grid functions -> TetrisGrid, Tile functions, etc.)
 
 ## Engine
 - [x] Player count + 2p options in `Game ABC`
@@ -52,7 +52,7 @@
 - [x] There probably should be a gameLoop() method of some kind. What kind of design pattern(s) are good for this interface? 
     - IInputHandler and IGameLoop implement an update/draw/init that functions as our game loop
 
-- [ ] At this point, it's probably better to explicitly include the library elements your TMGE or games will build on top of or extend and use them and their constituents methods in your design (e.g., the Application, Stage, and Scene classes in JavaFX). (● draw(): Renders the game to the screen. Called repeatedly in the game loop.)
+- [x] At this point, it's probably better to explicitly include the library elements your TMGE or games will build on top of or extend and use them and their constituents methods in your design (e.g., the Application, Stage, and Scene classes in JavaFX). (● draw(): Renders the game to the screen. Called repeatedly in the game loop.)
 
 - [x] You can replace these event handlers/callback methods with whatever UI/GUI framework you end up deciding to use. (● handleKeyPress(KeyEvent): Processes key press events. ● handleKeyRelease(KeyEvent): Processes key release events)
 
@@ -64,14 +64,12 @@
 
 - [ ] Identify as many opportunities for design patterns that would help improve your design and implementation and mark them up in your UML design (e.g., use a UML note).
 
-- [ ] Hmm. I'm unsure why stats is a Map, especially since it's not documented earlier either. 
-
 - [ ] Will your games be turn-based or real-time? I don't see a Clock class or interface, so it looks like it will be turn-based. 
     - update is our clock ticker
 
 **Template**
-  - Not enough operations, need very fixed skeletal structure
-  - [ ] **professor said look at `Game` ABC. Claude says we must add `play()` method**
+    - Not enough operations, need very fixed skeletal structure
+    - [x] **professor said look at `Game` ABC. Claude says we must add `play() `method**
         ```py
             ' Template method that defines the game algorithm
         +final play(): void {

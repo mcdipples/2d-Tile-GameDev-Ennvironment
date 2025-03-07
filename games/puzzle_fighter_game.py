@@ -181,7 +181,7 @@ class PuzzleFighterGame(Game):
         if not piece:
             return False
 
-        for x, y, _ in piece.get_positions():
+        for x, y, _ in piece.get_positions:
             if not (0 <= x < self.grids[player].columns and y < self.grids[player].rows):
                 return False
             if y >= 0 and self.grids[player].get_tile(y, x):
@@ -220,7 +220,7 @@ class PuzzleFighterGame(Game):
             return
 
         # Place the gems
-        for x, y, tile in piece.get_positions():
+        for x, y, tile in piece.get_positions:
             if y >= 0:
                 self.grids[player].place_tile(tile, y, x)
 
@@ -231,7 +231,7 @@ class PuzzleFighterGame(Game):
         self._process_power_gems(player)
 
         # Then check for normal matches
-        for x, y in [(x, y) for x, y, _ in piece.get_positions()]:
+        for x, y in [(x, y) for x, y, _ in piece.get_positions]:
             if y >= 0:
                 tile = self.grids[player].get_tile(y, x)
                 if tile and tile.tile_type == 'gem':

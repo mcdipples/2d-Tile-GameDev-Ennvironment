@@ -54,7 +54,6 @@ class Grid:
         self.tiles[x][y] = tile
         return True
 
-    @property
     def get_tile(self, x: int, y: int) -> Optional[Tile]:
         """
         get_tile
