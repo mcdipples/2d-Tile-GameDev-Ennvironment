@@ -87,7 +87,7 @@ class LoginWindow:
 
     def login(self) -> None:
         username = self.username_entry.get()
-        profiles = self.tmge.get_player_profiles()
+        profiles = self.tmge.get_player_profiles
         
         for profile in profiles:
             if profile.username == username:

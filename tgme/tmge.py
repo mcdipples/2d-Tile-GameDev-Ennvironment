@@ -112,6 +112,7 @@ class TMGE(IGameManager):
         self.logger.info(f"Registering game: {game.game_id}")
         self.games.append(game)
 
+    @property
     def get_available_games(self) -> List[Game]:
         """
         get_available_games
@@ -124,6 +125,7 @@ class TMGE(IGameManager):
         """
         return self.games
 
+    @property
     def get_player_profiles(self) -> List[PlayerProfile]:
         """
         get_player_profiles

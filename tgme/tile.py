@@ -32,6 +32,7 @@ class Tile:
     def set_position(self, x: int, y: int) -> None:
         self.position = (x, y)
 
+    @property
     def get_position(self) -> Tuple[int, int]:
         return self.position
 

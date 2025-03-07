@@ -38,6 +38,7 @@ class TetrisPiece:
         # Rotate piece clockwise around (0,0)
         self.coords = [(y, -x) for (x, y) in self.coords]
 
+    @property
     def get_positions(self) -> List[Tuple[int, int]]:
         # Return actual board positions of piece
         return [(self.x + x, self.y + y) for (x, y) in self.coords]

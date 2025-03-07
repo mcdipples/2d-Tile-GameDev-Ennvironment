@@ -13,7 +13,10 @@ class PlayerProfile:
             None
         """
         self.username: str = username
-        self.stats: Dict[str, GameStats] = {}
+        
+        #^ CHANGED FROM GameStats to int for stats
+        #^ ======================================
+        self.stats: Dict[str, int] = {}
 
     def login(self, username: str) -> None:
         """
@@ -28,6 +31,7 @@ class PlayerProfile:
         # In a real implementation, you'd verify credentials.
         self.username = username
 
+
     def update_stats(self, game_id: str, stats: GameStats) -> None:
         """
         update_stats
@@ -39,4 +43,16 @@ class PlayerProfile:
         Returns:
             None
         """
-        self.stats[game_id] = stats 
+        self.stats[game_id] = stats
+
+    def get_stats(self, game_id: str) -> int:
+        """
+        get_stats
+
+        Args:
+            game_id (str): The identifier of the game
+
+        Returns:
+            stats (int): The stats of the game
+        """
+        return self.stats[game_id]

@@ -1,0 +1,197 @@
+@startuml
+
+' --- Core Game Management ---
+class TMGE implements IGameManager {
+    -games: List<Game>
+    -player_profiles: List<PlayerProfile>
+    -profiles_file: str
+    +register_game(game: Game): void
+    +get_available_games(): List<Game>
+    +get_player_profiles(): List<PlayerProfile>
+    +add_player_profile(profile: PlayerProfile): void
+    +load_profiles(): void
+    +save_profiles(): void
+    +start(): void
+    +quit(): void
+}
+
+' --- Profile & Stats ---
+class PlayerProfile {
+    -username: str
+    -stats: Dict[str, GameStats]
+    +login(username: str): void
+    +update_stats(game_id: str, stats: GameStats): void
+}
+
+class GameStats {
+    -high_score: int
+    -games_played: int
+    -wins: int
+    +update_score(score: int): void
+    +increment_games_played(): void
+    +add_win(): void
+}
+
+' --- Game Core ---
+abstract class Game implements IGameLoop, IInputHandler {
+    #logger: TMGELogger
+    #game_id: str
+    #grid: Grid
+    #players: List<Player>
+    #is_paused: bool
+    #is_game_over: bool
+    {abstract} initialize_game(): void
+    {abstract} check_win_condition(): bool
+    {abstract} check_loss_condition(): bool
+    +handle_game_over(): void
+    +restart_game(): void
+    +exit_to_menu(): void
+    +pause_game(): void
+}
+
+class TetrisGame extends Game {
+    -grids: List<Grid>
+    -current_pieces: List<TetrisPiece>
+    -scores: List<int>
+    -controls: Dict
+    +initialize_game(): void
+    +check_win_condition(): bool
+    +check_loss_condition(): bool
+}
+
+class PuzzleFighterGame extends Game {
+    -grids: List<Grid>
+    -current_pieces: List<PuzzleFighterPiece>
+    -scores: List<int>
+    -combo_counters: List<int>
+    -pending_attacks: List<List>
+    +initialize_game(): void
+    +check_win_condition(): bool
+    +check_loss_condition(): bool
+}
+
+' --- Grid System ---
+class Grid {
+    -rows: int
+    -columns: int
+    -tiles: List<List<Optional<Tile>>>
+    +place_tile(tile: Tile, x: int, y: int): bool
+    +get_tile(x: int, y: int): Optional<Tile>
+    +check_tile_matches(min_match: int): List<List<Tile>>
+    +clear_matches(matches: List<List<Tile>>): int
+    +is_valid_movement(tile: Tile, new_x: int, new_y: int): bool
+}
+
+class Tile {
+    -tile_type: Any
+    -tile_state: str
+    -tile_shape: TileShape
+    -tile_color: str
+    -position: Tuple[int, int]
+    +is_matching(other: Tile): bool
+    +set_position(x: int, y: int): void
+    +get_position(): Tuple[int, int]
+}
+
+' --- Game Pieces ---
+class TetrisPiece {
+    +SHAPES: Dict
+    +COLORS: Dict
+    -shape: str
+    -color: str
+    -coords: List<Tuple>
+    +move(dx: int, dy: int): void
+    +rotate(): void
+    +get_positions(): List<Tuple>
+}
+
+class PuzzleFighterPiece {
+    +COLORS: List
+    +TYPES: List
+    -main_color: str
+    -sub_color: str
+    -connector_position: str
+    +rotate_clockwise(): void
+    +get_positions(): List<Tuple>
+    +move(dx: int, dy: int): void
+}
+
+' --- Views ---
+class GameUI {
+    -root: tk.Tk
+    -game: Game
+    -canvas: tk.Canvas
+    -cell_size: int
+    +init_ui(): void
+    +draw_grid(): void
+    +update(): void
+}
+
+class LoginWindow {
+    -tmge: TMGE
+    -window: tk.Tk
+    -on_login_success: Callable
+    +setup_ui(): void
+    +login(): void
+    +show_create_profile(): void
+}
+
+class HomeWindow {
+    -tmge: TMGE
+    -profile: PlayerProfile
+    -window: tk.Tk
+    +create_widgets(): void
+    +create_games_section(): void
+    +create_stats_section(): void
+    +start_game(game: Game): void
+}
+
+' --- Interfaces ---
+interface IGameLoop {
+    +init(): void
+    +update(): void
+    +draw(): void
+}
+
+interface IGameManager {
+    +start(): void
+    +quit(): void
+}
+
+interface IInputHandler {
+    +handle_key_press(event: object): void
+    +handle_key_release(event: object): void
+}
+
+' --- Utility ---
+class TMGELogger {
+    -logger: Logger
+    +debug(message: str): void
+    +info(message: str): void
+    +warning(message: str): void
+    +error(message: str): void
+}
+
+' --- Player ---
+class Player {
+    -profile: PlayerProfile
+    -score: int
+    +update_score(points: int): void
+}
+
+' --- Relationships ---
+TMGE "1" o-- "*" Game
+TMGE "1" o-- "*" PlayerProfile
+Game "1" *-- "1" Grid
+Game "1" *-- "2" Player
+Grid "1" *-- "*" Tile
+Player --> PlayerProfile
+PlayerProfile "1" -- "*" GameStats
+GameUI "1" -- "1" Game
+HomeWindow "1" -- "1" TMGE
+LoginWindow "1" -- "1" TMGE
+TetrisGame "1" *-- "*" TetrisPiece
+PuzzleFighterGame "1" *-- "*" PuzzleFighterPiece
+Game "*" -- "1" TMGELogger
+
+@enduml
