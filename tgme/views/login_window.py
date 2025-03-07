@@ -147,7 +147,7 @@ class LoginWindow:
             return
 
         # Check if username already exists
-        if any(p.username == new_username for p in self.tmge.get_player_profiles()):
+        if any(p.username == new_username for p in self.tmge.get_player_profiles):
             messagebox.showerror("Error", "Username already exists!")
             return
 
