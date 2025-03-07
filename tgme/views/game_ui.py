@@ -119,8 +119,8 @@ class GameUI:
                     piece = self.game.current_pieces[player]
                     
                     # Handle PuzzleFighter format
-                    if hasattr(piece, 'get_positions') and len(piece.get_positions()[0]) == 3:
-                        for x, y, tile in piece.get_positions():
+                    if hasattr(piece, 'get_positions') and len(piece.get_positions[0]) == 3:
+                        for x, y, tile in piece.get_positions:
                             if y >= 0:  # Only draw if visible
                                 x1 = offset_x + x * self.cell_size
                                 y1 = y * self.cell_size
@@ -131,7 +131,7 @@ class GameUI:
                                                            outline='white')
                     # Handle Tetris format
                     else:
-                        for x, y in piece.get_positions():
+                        for x, y in piece.get_positions:
                             if y >= 0:  # Only draw if visible
                                 x1 = offset_x + x * self.cell_size
                                 y1 = y * self.cell_size
@@ -181,7 +181,7 @@ class GameUI:
 
             # Draw current piece for Tetris
             if hasattr(self.game, 'current_piece') and self.game.current_piece:
-                for x, y in self.game.current_piece.get_positions():
+                for x, y in self.game.current_piece.get_positions:
                     if y >= 0:  # Only draw if visible
                         x1 = x * self.cell_size
                         y1 = y * self.cell_size

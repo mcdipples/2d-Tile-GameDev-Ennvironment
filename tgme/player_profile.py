@@ -45,7 +45,6 @@ class PlayerProfile:
         """
         self.stats[game_id] = stats
 
-    @property
     def get_stats(self, game_id: str) -> int:
         """
         get_stats

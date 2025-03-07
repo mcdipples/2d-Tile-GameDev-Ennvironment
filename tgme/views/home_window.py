@@ -9,14 +9,14 @@ from games.tetris_game import TetrisGame
 from games.puzzle_fighter_game import PuzzleFighterGame
 
 class HomeWindow:
-    def __init__(self, tmge, profile, game_controls_dict) -> None:
+    def __init__(self, tmge, profile, controls) -> None:
         self.tmge = tmge
         self.profile = profile
-        self.game_controls_dict = game_controls_dict
         self.window = tk.Tk()
         self.window.title("TMGE Gaming Hub")
         self.window.geometry("1024x768")
         self.window.configure(bg='#ffffff')
+        self.controls = controls
         
         # Configure styles
         self.style = ttk.Style()
@@ -80,7 +80,7 @@ class HomeWindow:
         games_grid = ttk.Frame(games_frame, style='Modern.TFrame')
         games_grid.pack(fill=tk.BOTH, expand=True)
 
-        for i, game in enumerate(self.tmge.get_available_games()):
+        for i, game in enumerate(self.tmge.get_available_games):
             game_card = self.create_game_card(games_grid, game)
             game_card.pack(fill=tk.X, pady=(0, 15))
 
@@ -170,7 +170,7 @@ class HomeWindow:
 
         # Create new instance of the game
         game_class = type(game_template)
-        new_game = game_class(game_id=game_template.game_id, players=[player1, player2], controls=self.game_controls_dict[game_template.game_id])
+        new_game = game_class(game_id=game_template.game_id, players=[player1, player2], controls=self.controls[game_template.game_id])
 
         # Create new game window
         game_window = tk.Toplevel(self.window)

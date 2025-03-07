@@ -89,7 +89,7 @@ class TetrisGame(Game):
         if not self.current_pieces[player]:
             return False
 
-        for x, y in self.current_pieces[player].get_positions():
+        for x, y in self.current_pieces[player].get_positions:
             if not (0 <= x < self.grids[player].columns and y < self.grids[player].rows):
                 return False
             if y >= 0 and self.grids[player].get_tile(y, x):
@@ -120,7 +120,7 @@ class TetrisGame(Game):
         if not self.current_pieces[player]:
             return
 
-        for x, y in self.current_pieces[player].get_positions():
+        for x, y in self.current_pieces[player].get_positions:
             if y >= 0:
                 # Create tile with the piece's color as both tile_type and tile_color
                 tile = Tile(
