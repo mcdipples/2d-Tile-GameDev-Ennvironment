@@ -47,7 +47,7 @@ class TMGEApplication:
         self.tmge.register_game(puzzle_fighter)
 
         # Show home window
-        home = HomeWindow(self.tmge, self.current_profile, self.game_controls_dict)
+        home = HomeWindow(self.tmge, self.current_profile, controls=self.game_controls_dict)
         home.window.mainloop()
 
     def quit_tmge(self) -> None:
