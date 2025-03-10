@@ -1,5 +1,4 @@
 # TODO
-- [ ] Jasper's dad has got it goin on with his mom
 - [x] Add logging for object instantiation (game pieces, players, etc.)
 - [x] Add logging for game state changes
 - [x] Add logging for important game events
@@ -60,7 +59,7 @@
     - Updated / Moved to Game class
     - IInputHandler and IGameLoop implement an update/draw/init that functions as our game loop
 
-- [ ] The matching criteria or algorithms are first-class entities in a tile-matching games. They should probably be classifiers (e.g., UML interfaces or classes). In fact, what design pattern would be a good fit for your Matching classifier?
+- [x] The matching criteria or algorithms are first-class entities in a tile-matching games. They should probably be classifiers (e.g., UML interfaces or classes). In fact, what design pattern would be a good fit for your Matching classifier?
 
 - [ ] Identify as many opportunities for design patterns that would help improve your design and implementation and mark them up in your UML design (e.g., use a UML note).
 

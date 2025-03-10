@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from typing import Dict, Any, Type
+from tgme.matching_strategy_factory import MatchingStrategyFactory
 from tgme.player_profile import PlayerProfile
 from tgme.player import Player
 from tgme.tmge import TMGE
 from tgme.views.game_ui import GameUI
 from games.tetris_game import TetrisGame
 from games.puzzle_fighter_game import PuzzleFighterGame
+from tgme.interfaces import IMatchingStrategy
 
 class HomeWindow:
     def __init__(self, tmge, profile, controls) -> None:
@@ -168,9 +170,11 @@ class HomeWindow:
         player1 = Player(self.profile)
         player2 = Player(PlayerProfile("Player2"))
 
+        matching_strategy = MatchingStrategyFactory.get_strategy(game_template.game_id)
+
         # Create new instance of the game
         game_class = type(game_template)
-        new_game = game_class(game_id=game_template.game_id, players=[player1, player2], controls=self.controls[game_template.game_id])
+        new_game = game_class(game_id=game_template.game_id, players=[player1, player2], controls=self.controls[game_template.game_id], matching_strategy=matching_strategy)
 
         # Create new game window
         game_window = tk.Toplevel(self.window)

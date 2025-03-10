@@ -1,10 +1,21 @@
 import random
-from typing import List, Optional, Set, Tuple
+from typing import List, Set, Tuple
 import time
 from tgme.game import Game
 from tgme.player import Player
 from tgme.tile import Tile
 from tgme.grid import Grid
+from tgme.interfaces import IMatchingStrategy
+from games.puzzle_fighter_piece import PuzzleFighterPiece
+
+import random
+from typing import List, Set, Tuple
+import time
+from tgme.game import Game
+from tgme.player import Player
+from tgme.tile import Tile
+from tgme.grid import Grid
+from tgme.interfaces import IMatchingStrategy
 from games.puzzle_fighter_piece import PuzzleFighterPiece
 import os
 
@@ -12,8 +23,8 @@ class PuzzleFighterGame(Game):
     min_players = 1
     max_players = 2
     
-    def __init__(self, game_id: str, players: List[Player], controls) -> None:
-        super().__init__(game_id, 12, 6, players, controls=controls)
+    def __init__(self, game_id: str, players: List[Player], controls, matching_strategy: IMatchingStrategy) -> None:
+        super().__init__(game_id, 12, 6, players, controls=controls, matching_strategy=matching_strategy)
         
         # Create grids for each player
         self.grids = [Grid(12, 6) for _ in range(len(players))]
@@ -25,13 +36,6 @@ class PuzzleFighterGame(Game):
         self.game_over = [False] * len(players)
         self.combo_counters = [0] * len(players)
         self.music_path = os.path.join(os.path.dirname(__file__), '..', 'music', "Sonic_1_Music_ Marble_Zone.mp3")
-
-        # Controls are set in Game constructor
-        # # Controls for each player
-        # self.controls = [
-        #     {'left': 'a', 'right': 'd', 'down': 's', 'rotate': 'w', 'counter_rotate': 'q'},
-        #     {'left': 'Left', 'right': 'Right', 'down': 'Down', 'rotate': 'Up', 'counter_rotate': 'Delete'}
-        # ]
         
         # Add attack queue
         self.pending_attacks = [[], []]  # List of rows to add for each player
@@ -64,17 +68,9 @@ class PuzzleFighterGame(Game):
             self._apply_gravity(player)
 
             # Look for new matches after gems have fallen
-            for y in range(self.grids[player].rows):
-                for x in range(self.grids[player].columns):
-                    tile = self.grids[player].get_tile(y, x)
-                    if not tile or tile.tile_type != 'gem':
-                        continue
-
-                    # Check adjacent gems for matches
-                    color = tile.tile_color
-                    matches = self._find_adjacent_matches(player, x, y, color, set())
-                    if len(matches) >= 3:  # Need at least 3 matching gems
-                        crash_positions.update(matches)
+            matches = self.matching_strategy.match(self.grids[player])
+            for match in matches:
+                crash_positions.update([(tile.x, tile.y) for tile in match])
 
             if crash_positions:
                 self.combo_counters[player] += 1
@@ -89,27 +85,6 @@ class PuzzleFighterGame(Game):
             opponent = 1 if player == 0 else 0
             self.pending_attacks[opponent].extend(['gray'] * attack_rows)
             self.logger.info(f"Player {player + 1} sends {attack_rows} rows to opponent")
-
-    def _find_adjacent_matches(self, player: int, x: int, y: int, color: str, visited: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
-        """Find all connected gems of the same color using flood fill"""
-        if not (0 <= x < self.grids[player].columns and 0 <= y < self.grids[player].rows):
-            return set()
-
-        if (x, y) in visited:
-            return set()
-
-        tile = self.grids[player].get_tile(y, x)
-        if not tile or tile.tile_color != color:
-            return set()
-
-        matches = {(x, y)}
-        visited.add((x, y))
-
-        # Check all adjacent positions
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            matches.update(self._find_adjacent_matches(player, x + dx, y + dy, color, visited))
-
-        return matches
 
     def _apply_gravity(self, player: int) -> None:
         """Make gems fall to fill empty spaces"""
@@ -330,3 +305,24 @@ class PuzzleFighterGame(Game):
             self.restart_game()
         else:
             self.exit_to_menu()
+
+    def _find_adjacent_matches(self, player: int, x: int, y: int, color: str, visited: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+        """Find all connected gems of the same color using flood fill"""
+        if not (0 <= x < self.grids[player].columns and 0 <= y < self.grids[player].rows):
+         return set()
+
+        if (x, y) in visited:
+            return set()
+
+        tile = self.grids[player].get_tile(y, x)
+        if not tile or tile.tile_color != color:
+            return set()
+
+        matches = {(x, y)}
+        visited.add((x, y))
+
+        # Check all adjacent positions
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            matches.update(self._find_adjacent_matches(player, x + dx, y + dy, color, visited))
+
+        return matches
