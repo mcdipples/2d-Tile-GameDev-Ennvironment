@@ -27,6 +27,7 @@ class PuzzleFighterPiece:
         )
         self.sub_tile = Tile('gem', 'active', color=self.sub_color)
 
+
     def rotate_clockwise(self) -> None:
         """Rotate the connector gem clockwise around main gem"""
         if self.connector_position == 'right':

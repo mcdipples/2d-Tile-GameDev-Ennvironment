@@ -18,17 +18,10 @@ class TMGEApplication:
         self.tmge.start()
         self.current_profile = None
         self.game_controls_dict = self.set_controls()
-        self.play_music()
 
     def on_login_success(self, profile: PlayerProfile) -> None:
         self.current_profile = profile
         self.show_main_window()
-
-    def play_music(self):
-        pygame.mixer.init()
-        pygame.mixer.music.load("background_music.mp3")  # Replace with your file
-        pygame.mixer.music.set_volume(0.5)  # Adjust volume (0.0 to 1.0)
-        pygame.mixer.music.play(-1)  # -1 makes it loop indefinitely
 
     '''
         def show_main_window(self) -> None:

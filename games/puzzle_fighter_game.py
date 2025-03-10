@@ -6,6 +6,7 @@ from tgme.player import Player
 from tgme.tile import Tile
 from tgme.grid import Grid
 from games.puzzle_fighter_piece import PuzzleFighterPiece
+import os
 
 class PuzzleFighterGame(Game):
     min_players = 1
@@ -23,7 +24,8 @@ class PuzzleFighterGame(Game):
         self.last_falls = [time.time()] * len(players)
         self.game_over = [False] * len(players)
         self.combo_counters = [0] * len(players)
-        
+        self.music_path = os.path.join(os.path.dirname(__file__), '..', 'music', "Sonic_1_Music_ Marble_Zone.mp3")
+
         # Controls are set in Game constructor
         # # Controls for each player
         # self.controls = [

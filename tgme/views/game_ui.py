@@ -4,6 +4,7 @@ from typing import Optional, List, Tuple, Any
 from tgme.game import Game
 from tgme.grid import Grid
 from tgme.tile import Tile
+import pygame
 
 class GameUI:
     '''
@@ -11,6 +12,7 @@ class GameUI:
     '''
     def __init__(self, root: tk.Tk, game: Game) -> None:
         self.root = root
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)   # For music cleanup
         self.game = game
         self.cell_size = 30
         self.padding = 50
@@ -84,6 +86,25 @@ class GameUI:
 
         self.root.bind('<Key>', self.game.handle_key_press)
         self.root.bind('<KeyRelease>', self.game.handle_key_release)
+
+        # if not blank for music path
+        if self.game.music_path and self.game.music_path.strip():
+                self.play_music(self.game.music_path)
+
+    def play_music(self, file_path = "music/background_music.mp3"):
+        pygame.mixer.init()
+        pygame.mixer.music.load(file_path)
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)  # -1 makes it loop indefinitely
+
+    def on_close(self) -> None:
+        if pygame.mixer.get_init():  # Check if the mixer is initialized
+            pygame.mixer.music.stop()
+            pygame.mixer.music.unload()  # Unload music to free resources
+            pygame.mixer.quit()  # Quit the mixer
+
+        pygame.quit()  # Quit pygame completely
+        self.root.destroy()
 
     def draw_grid(self) -> None:
         if not self.canvas:
