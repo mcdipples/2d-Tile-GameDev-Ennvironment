@@ -2,8 +2,9 @@ import tkinter as tk
 from tgme.tmge import TMGE
 from tgme.player_profile import PlayerProfile
 from tgme.player import Player
-from tgme.game import SampleMatchingGame
 from games.tetris_game import TetrisGame
+from games.tetris_matching_strategy import TetrisMatchingStrategy
+from games.puzzle_fighter_matching_strategy import PuzzleFighterMatchingStrategy
 from games.puzzle_fighter_game import PuzzleFighterGame
 from tgme.views.game_ui import GameUI
 from tgme.views.login_window import LoginWindow
@@ -39,9 +40,12 @@ class TMGEApplication:
         player1 = Player(self.current_profile)
         player2 = Player(PlayerProfile("Player2"))  # Temporary second player
         
+        tetris_matching_strategy = TetrisMatchingStrategy()
+        puzzle_fighter_matching_strategy = PuzzleFighterMatchingStrategy()
+        
         # Register games with two players
-        tetris_game = TetrisGame(game_id='Tetris', players=[player1, player2], controls=self.game_controls_dict['Tetris'])
-        puzzle_fighter = PuzzleFighterGame(game_id='Puzzle Fighter', players=[player1, player2], controls=self.game_controls_dict['Puzzle Fighter'])
+        tetris_game = TetrisGame(game_id='Tetris', players=[player1, player2], controls=self.game_controls_dict['Tetris'], matching_strategy=tetris_matching_strategy)
+        puzzle_fighter = PuzzleFighterGame(game_id='Puzzle Fighter', players=[player1, player2], controls=self.game_controls_dict['Puzzle Fighter'], matching_strategy=puzzle_fighter_matching_strategy)
         
         self.tmge.register_game(tetris_game)
         self.tmge.register_game(puzzle_fighter)

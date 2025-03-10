@@ -1,6 +1,7 @@
 from typing import List, Optional
 import time
 from tgme.game import Game
+from tgme.interfaces import IMatchingStrategy
 from tgme.player import Player
 from tgme.tile import Tile
 from games.tetris_piece import TetrisPiece
@@ -10,9 +11,9 @@ class TetrisGame(Game):
     min_players = 1  # Class-level attribute
     max_players = 2  # Class-level attribute
     
-    def __init__(self, game_id: str, players: List[Player], controls) -> None:
+    def __init__(self, game_id: str, players: List[Player], controls, matching_strategy: IMatchingStrategy) -> None:
         # Call parent class constructor with inherited player limits
-        super().__init__(game_id, 20, 10, players, controls=controls)
+        super().__init__(game_id, 20, 10, players, controls=controls, matching_strategy=matching_strategy)
         
         # Create grids based on player count
         self.grids = [Grid(20, 10) for _ in range(len(players))]
@@ -132,20 +133,24 @@ class TetrisGame(Game):
 
     def _clear_lines(self, player: int) -> None:
         lines_cleared = 0
-        y = self.grids[player].rows - 1
-        while y >= 0:
-            if all(self.grids[player].get_tile(y, x) for x in range(self.grids[player].columns)):
-                # Move all lines above down
-                for y2 in range(y - 1, -1, -1):
-                    for x in range(self.grids[player].columns):
-                        self.grids[player].tiles[y2 + 1][x] = self.grids[player].tiles[y2][x]
-                # Clear top line
-                for x in range(self.grids[player].columns):
-                    self.grids[player].tiles[0][x] = None
-                lines_cleared += 1
-            else:
-                y -= 1
 
+        # Use the matching strategy to find the full lines
+        full_lines = self.matching_strategy.match(self.grids[player])
+
+        # For each full line, clear it and shift the lines above down
+        for y in full_lines:
+            # Move all lines above the current one down
+            for y2 in range(y - 1, -1, -1):
+                for x in range(self.grids[player].columns):
+                    self.grids[player].tiles[y2 + 1][x] = self.grids[player].tiles[y2][x]
+            
+            # Clear the top line
+            for x in range(self.grids[player].columns):
+                self.grids[player].tiles[0][x] = None
+            
+            lines_cleared += 1
+
+        # Update score based on the number of lines cleared
         if lines_cleared:
             self.scores[player] += [100, 300, 500, 800][lines_cleared - 1]
             self.players[player].update_score(self.scores[player])

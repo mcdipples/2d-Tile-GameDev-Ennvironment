@@ -1,6 +1,7 @@
 import abc
 from abc import ABC
-from typing import Protocol
+from typing import List
+from tgme.tile import Tile
 
 class IGameManager(ABC):
     def manage_games(self) -> None:
@@ -101,3 +102,17 @@ class IInputHandler(ABC):
             None
         """
         pass 
+
+class IMatchingStrategy(ABC):
+    @abc.abstractmethod
+    def match(self, grid: 'Grid') -> List[List[Tile]]:
+        """
+        Abstract method for matching tiles based on game-specific logic.
+
+        Args:
+            grid (Grid): The grid of the current game.
+
+        Returns:
+            List[List[Tile]]: A list of matched tiles that meet the matching criteria.
+        """
+        pass
