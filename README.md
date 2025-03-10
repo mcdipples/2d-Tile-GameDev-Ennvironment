@@ -1,95 +1,65 @@
-# 2d-Tile-GameDev-Ennvironment
+# 2D Tile GameDev Ennvironment
 
-## Description
+## Prerequisites
 
-Design and implement an extensible Tile-Matching Game Environment (TMGE). We will adhere to the definition of a tile-matching game as used in this [Wikipedia article](https://en.wikipedia.org/wiki/Tile-matching_video_game).
+- Python 3.9+
+- pygame (for music)
+- tkinter (for GUI)
 
-## Team Structure
-- Work in teams of 4-5 students
-- In-class team formation assistance available
-- Assignment to teams if needed
+## Installation
 
-## Requirements
+1. Clone/Download the repository
+2. Install dependencies:
 
-The TMGE should:
-- Accommodate any tile-matching game involving a grid layout and game elements (e.g. Tetris, Klax, Bejeweled, etc.)
-- Facilitate easy implementation of new games
-- Provide a defined interface for all games
-- Support two players on the same local machine
-- Include personal player profiles (flexible specifications)
-- Support 2-player games minimum (additional player support optional)
-- Present players with a selectable game list
+```
+pip install pygame
+pip install tkinter
+```
 
-## Deliverables
+## How to Run
 
-1. The TMGE core system
-2. Two or more tile-matching games built on the TMGE
-3. Documentation
-4. Running instructions
-5. Runnable code via GitHub repository
-6. Peer evaluations
+Launch in root project's directory:
+```
+python main.py
+- or -
+python3 main.py
+```
 
-## Development Guidelines
+## Add Games
 
-### Reuse Policy
-- No existing game environment implementations
-- Component reuse requires professor approval
+### Step One: Creating GamePiece Class
 
-### Grading Criteria
+- All implemented concrete classes of ImplementedGame and GamePieces should be stored in the 'games' folder, as shown below
 
-Stakeholder considerations:
-1. **Players**: Quality of gaming experience
-2. **Future TMGE Developers**: Code quality and design clarity
-3. **Game Developers**: TMGE extensibility and API usability
-4. **Team Members**: Individual contributions
+- Starting with the GamePiece classes, we want to store them in their `.py` file (e.g., `new_piece.py`). This is where we generally define the logic for how the pieces move, their positioning on the grid, and their visualization in the GUI for the ImplementedGame class (e.g., shape and color). In the example below, I will demonstrate a code snippet showing how to define the shapes, colors, constructor, move function, rotate function, and position getter function
 
-*Note: GUI is optional but may simplify implementation*
+### Step Two: Creating ImplementedGame Concrete Class
 
-### Technical Requirements
-- Clear designation of variant vs fixed components
-- Use of configuration management repository
-- Flexible presentation responsibilities within team
+- All implemented concrete classes of ImplementedGame and GamePieces should be stored in the `games/` folder, as shown below
 
-## Development Schedule
+- Starting with the ImplementedGame concrete classes, we want to store them in their own `.py` file (e.g., `new_game.py`). It will then require the following imports, as shown below.
 
-### In-Class Sessions
-Multiple weeks dedicated to:
-- Team meetings
-- Professor consultations
-- TA discussions
-- Design and implementation work
+- After importing the classes from the games folder, we will create the ImplementedGame concrete class with the Game class as a parameter, which will implement all of its abstract methods. Additionally, it is important to provide values for `min_players` and `max_players`, as these are class-level attributes that store data shared among all instances of the class.
 
-### Final Two Weeks
+- Moving on to the constructor of the class, it takes the parameters self, `game_id`, and players, while also calling the parent class constructor and passing it `game_id`, rows, columns, and players. This is typically the function where you can create a grid (either multiple or single) based on specific criteria, as well as configure the controls. In the example below, I will create a 20x10 grid for a specified number of players (1-2) and set up the control configurations.
 
-#### Final Demo
-- TMGE and game demonstration
-- 10-minute maximum per team
+- Next, for the `initialize_game` abstract method, we can declare the variables needed for our game. In the example below, I provide an array of two GamePiece class objects that already have the logic implemented and are generated for the grid, as well as the scores for the two players and the starting status of each player's game.
 
-#### Documentation
-Submit via Canvas:
-- Final design document
-- Updated UML with explanations
-- New game implementation guide
-- Design evolution description
-- Project retrospective
-- Peer evaluations
+- The same goes for the `check_win_condition` and `check_loss_condition` abstract method in terms of providing a declaration of what it is supposed to do for this specific game.
 
-## Project Management Suggestions
+- These are just the basics or main requirements for implementation of a new game to be built off the TGME class defined by our team, but as you can see below of the complete remaining example code we are able to add more methods or add onto existing ones to meet the requirements of our game.
 
-1. Team Organization
-   - Create sub-teams
-   - Appoint team lead(s)
-   - Focus on efficient division of work
+### Step Three: Update `main.py`
 
-2. Communication
-   - Utilize group communication tools (e.g., Slack)
+- After creating both the ImplementedGame concrete class and the GamePiece class within the `games/` folder, we can move on to adding this new game to the TGME system. This can all be done in the `main.py` file in the root folder of the project. First, we just need to import the ImplementedGame concrete class from the ‘games’ folder, as shown below.
 
-3. Development Approach
-   - Identify common game elements
-   - Build strong abstractions
-   - Develop clear interfaces
+- Lastly, within the `show_main_window` method of the TMGEApplication class, all we need to do is assign a variable to the constructor of the ImplementedGame concrete class, passing the appropriate parameter to create an object of that class. This object will then be passed into the tmge.`register_game` method to be added to the main window’s game selection screen, allowing users to choose it from their list of available games.
 
-## Extra Credit Opportunities
+- You should see the game listed after running `main.py`, logging in, and accessing the game selection screen in the main menu.
 
-1. GUI Implementation (3% extra credit)
-2. Real-time Play Support (3% extra credit)
+## Add Music
+
+1. Add your mp3 to the `music` directory
+2. In your game's source code, set `self.music_path` to the file path of your mp3 in `music`
+
+- Note: Games only support one song, and will loop until the window is closed

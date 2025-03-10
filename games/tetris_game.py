@@ -6,6 +6,7 @@ from tgme.player import Player
 from tgme.tile import Tile
 from games.tetris_piece import TetrisPiece
 from tgme.grid import Grid
+import os
 
 class TetrisGame(Game):
     min_players = 1  # Class-level attribute
@@ -23,7 +24,9 @@ class TetrisGame(Game):
         self.fall_speed = 0.5
         self.last_falls = [time.time()] * len(players)
         self.game_over = [False] * len(players)
+        self.music_path = os.path.join(os.path.dirname(__file__), '..', 'music', 'background_music.mp3')
         
+
         # Controls are now set in Game constructor
         # # Player-specific controls
         # self.controls = [

@@ -24,7 +24,8 @@ class Game(IGameLoop, IInputHandler, ABC):
         """
         self.logger = TMGELogger()
         self.logger.info(f"Initializing game: {game_id}")
-        
+        self.music_path = ""        
+
         # These should be set by child classes before calling super().__init__
         if not hasattr(self, 'min_players'):
             self.min_players = 1

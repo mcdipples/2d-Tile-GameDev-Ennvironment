@@ -9,6 +9,9 @@ from games.puzzle_fighter_game import PuzzleFighterGame
 from tgme.views.game_ui import GameUI
 from tgme.views.login_window import LoginWindow
 from tgme.views.home_window import HomeWindow
+import pygame
+
+
 
 class TMGEApplication:
     def __init__(self) -> None:
