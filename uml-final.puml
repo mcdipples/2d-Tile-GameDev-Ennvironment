@@ -48,6 +48,7 @@ abstract class Game implements IGameLoop, IInputHandler {
     #controls: Dict
     #is_paused: bool
     #is_game_over: bool
+    -matching_strategy: IMatchingStrategy
     {abstract} initialize_game(): void
     {abstract} check_win_condition(): bool
     {abstract} check_loss_condition(): bool
@@ -70,11 +71,16 @@ class TetrisGame extends Game {
     -fall_speed: float
     -last_falls: List<float>
     -game_over: List<bool>
+    + __init__(game_id: str, players: List<Player>, controls, matching_strategy: IMatchingStrategy)
     +_move_piece(player: int, dx: int, dy: int): bool
     +_rotate_piece(player: int): void
     +_hard_drop(player: int): void
     +_freeze_piece(player: int): void
     +_clear_lines(player: int): void
+}
+
+class TetrisMatchingStrategy implements IMatchingStrategy {
+    +match(grid: Grid): List[int]
 }
 
 class PuzzleFighterGame extends Game {
@@ -84,9 +90,17 @@ class PuzzleFighterGame extends Game {
     -fall_times: List<float>
     -combo_counters: List<int>
     -pending_attacks: List<List>
+    +__init__(game_id: str, players: List[Player], controls: Dict, matching_strategy: IMatchingStrategy): void
+    +_find_adjacent_matches(player: int, x: int, y: int, color: str, visited: Set[Tuple[int, int]]): Set[Tuple[int, int]]
     +_check_chain_reaction(): void
     +_process_power_gems(): void
     +_apply_gravity(): void
+}
+
+class PuzzleFighterMatchingStrategy implements IMatchingStrategy {
+    - visited: Set<Tuple<int, int>>
+    + match(grid: Grid) : List<List<Tile>>
+    + _find_adjacent_matches(grid: Grid, x: int, y: int, color: str, visited: Set<Tuple<int, int>>) : Set<Tuple<int, int>>
 }
 
 ' --- Game Pieces ---
@@ -121,13 +135,11 @@ class PuzzleFighterPiece {
 class Grid {
     -rows: int
     -columns: int
-    -tiles: List<List<Tile>>
+    -tiles: List[List[Optional[Tile]]]
+    +__init__(rows: int, columns: int): void
     +is_valid_position(x: int, y: int): bool
     +place_tile(tile: Tile, x: int, y: int): bool
-    +get_tile(x: int, y: int): Optional<Tile>
-    +check_tile_matches(min_match: int): List<List<Tile>>
-    +_find_matches_in_line(line: List[Optional[Tile]], min_match: int): List[List[Tile]]
-    +clear_matches(matches: List<List<Tile>>): int
+    +get_tile(x: int, y: int): Optional[Tile]
     +is_valid_movement(tile: Tile, new_x: int, new_y: int): bool
 }
 
@@ -226,7 +238,9 @@ interface IInputHandler {
     {abstract} handle_key_release(event: Object)
 }
 
-
+interface IMatchingStrategy {
+    +match(grid: Grid): List<List<Tile>>
+}
 
 ' --- Relationships ---
 TMGEApplication "1" o-- "1" TMGE
@@ -235,12 +249,18 @@ TMGE "1" o-- "*" PlayerProfile
 TMGE "1" o-- "1" TMGELogger
 Game "1" *-- "1..*" Grid
 Game "1" o-- "2" Player
+Game --> IMatchingStrategy : uses
 TetrisGame "1" *-- "*" TetrisPiece
+TetrisGame ..> IMatchingStrategy : uses
 PuzzleFighterGame "1" *-- "*" PuzzleFighterPiece
+PuzzleFighterGame ..> IMatchingStrategy : uses
 Grid "1" *-- "*" Tile
 Player "1" -- "1" PlayerProfile
 PlayerProfile "1" -- "*" GameStats
 HomeWindow "1" -- "1" TMGE
+HomeWindow --> MatchingStrategyFactory : uses
 LoginWindow "1" -- "1" TMGE
 GameUI "1" -- "1" Game
+
+MatchingStrategyFactory --> IMatchingStrategy : creates
 @enduml
